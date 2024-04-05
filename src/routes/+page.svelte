@@ -1,4 +1,17 @@
 
+<script>
+    import biovitals_demo from '$lib/images/biovitals-demo.jpeg';
+    import fifa19_binned from '$lib/images/fifa19_binned.png';
+    import svelte_dashboard from '$lib/images/svelte_dashboard.png';
+    import health_timeline_mockup_simple from '$lib/images/health_timeline_mockup_simple.png';
+    import vizforsocialgood_network from '$lib/images/vizforsocialgood-network.png';
+    import covid_network from '$lib/images/covid_network.png';
+    import d3_force from '$lib/images/d3-force-collection-demo.gif';
+    import data_visualizers from '$lib/images/data-visualizers.gif';
+    import leaflet_dash_map from '$lib/images/leaflet_dash_map.png';
+    import kiron_full from '$lib/images/kiron_full.png';
+</script>
+
 <div class='text-center'>
   <div class='flex justify-center items-center px-10 lg:px-20'>
     <svg viewBox="0 0 750 220">
@@ -13,7 +26,7 @@
 
   <div class='block md:flex p-8'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/biovitals-demo.jpeg'>
+      <img src={biovitals_demo}>
       <a href="https://www.biofourmis.com/care-delivery" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Data viz library for a healthcare tech company</h2>
@@ -23,7 +36,7 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/fifa19_binned.png'>
+      <img src={fifa19_binned}>
       <a href="https://sveltekit-dashboard.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Interactive dashboard for Web3 gaming company</h2>
@@ -35,7 +48,7 @@
   </div>
   <div class='block md:flex p-8 pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/svelte_dashboard.png'>
+      <img src={svelte_dashboard}>
       <a href="https://www.biofourmis.com/care-delivery" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Data viz library for a healthcare tech company</h2>
@@ -45,8 +58,8 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/health_timeline_mockup_simple.png'>
-      <a href="https://dianaow.com/blog/health_timeline/" target="_blank">
+      <img src={health_timeline_mockup_simple}>
+      <a href="https://dianaow.com/posts/health_timeline/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Web-based tool for monitoring clinical data</h2>
           <p>D3.js</p>
@@ -60,7 +73,7 @@
 
   <div class='block md:flex p-8 pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/vizforsocialgood-network.png'>
+      <img src={vizforsocialgood_network}>
       <a href="https://vizforsocialgood-network.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Network of Viz For Social Good contributers</h2>
@@ -70,8 +83,8 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/covid_network.png'>
-      <a href="https://dianaow.com/blog/covid19-network-singapore/" target="_blank">
+      <img src={covid_network}>
+      <a href="https://dianaow.com/posts/covid19-network-singapore/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>COVID-19 Network Singapore</h2>
           <p>React + D3</p>
@@ -85,7 +98,7 @@
 
   <div class='block md:flex p-8 pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/leaflet_dash_map.png' loading="lazy">
+      <img src={leaflet_dash_map} loading="lazy">
       <a href="" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Interactive geospatial dashboard</h2>
@@ -95,7 +108,7 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/kiron_full.png' loading="lazy">
+      <img src={kiron_full} loading="lazy">
         <a href="https://dianameow.com/vizforsocialgood/" target="_blank">
           <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
             <h2>Kiron</h2>
@@ -118,7 +131,7 @@
 
   <div class='block md:flex p-8 pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/d3-force-collection-demo.gif' loading="lazy">
+      <img src={d3_force} loading="lazy">
       <a href="https://d3-force-collection.netlify.com" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>d3-force compilation</h2>
@@ -127,7 +140,7 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src='/src/routes/images/data-visualizers.gif' loading="lazy">
+      <img src={data_visualizers} loading="lazy">
       <a href="https://data-visualizers.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>Data Visualization Society members in 2020</h2>
