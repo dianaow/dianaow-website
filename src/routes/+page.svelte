@@ -1,4 +1,3 @@
-
 <script>
     import biovitals_demo from '$lib/images/biovitals-demo.jpeg';
     import fifa19_binned from '$lib/images/fifa19_binned.png';

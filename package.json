@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@fontsource/inter": "^5.0.17",
 		"@fontsource/poppins": "^5.0.12",
+		"@sveltejs/adapter-vercel": "^5.2.0",
 		"googleapis": "^134.0.0",
 		"shiki": "^1.2.0"
 	}

@@ -13,7 +13,7 @@
 	<h1>Blog</h1>
 	{#each data.posts as post}
 		<div class="pb-4">
-			<a href={post.slug} class="title"><h2>{post.title}</h2></a>
+			<a href={'/posts/' + post.slug} class="title"><h2>{post.title}</h2></a>
 			<p class="date">{formatDate(post.date)}</p>
 			<h4>{post.description}</h4>
 			<div class="tags">
