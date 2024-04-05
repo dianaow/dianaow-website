@@ -60,7 +60,6 @@ const highlightCode = async (code, lang, meta) => {
 	return html
 }
 
-/** @type {import('mdsvex').MdsvexOptions} */
 const mdsvexOptions = {
 	extensions: ['.md', '.svelte'],
 	highlight: {
@@ -68,13 +67,16 @@ const mdsvexOptions = {
 	}
 }
 
-/** @type {import('@sveltejs/kit').Config} */
 const config = {
 	extensions: ['.svelte', '.md'],
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 	kit: {
 		adapter: adapter()
-	}
+	},
+	files: {
+		// Include multiple folders by separating them with commas
+		assets: ['src/posts/knowledge-graph-rag/images', 'src/posts/knowledge-graph-llm/images']
+  }
 }
 
 export default config

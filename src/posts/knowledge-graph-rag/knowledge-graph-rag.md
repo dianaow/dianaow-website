@@ -74,9 +74,7 @@ Create a Neo4j database, connect to it and ingest the graph data into it.
 
 <br/>
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/graph_overview.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/graph_overview.png)
 
 ## Creating vector indexes in Neo4j
 
@@ -128,9 +126,7 @@ While all properties can technically be emdedded, only properties whose values a
 
 <br/>
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/graph_index.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/graph_index.png)
 
 ## Querying the vector indexes
 
@@ -150,6 +146,8 @@ This is a standard snippet of code found in most LangChain Chatbot tutorials. It
 <figure>
   <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/retrievalQA_results.png" />
 </figure>
+
+![Graph overview](/src/posts/knowledge-graph-rag/images/graph_overview.png)
 
 ## Querying Neo4j database
 
@@ -181,9 +179,7 @@ While a really cool functionality, it is error prone, particularly so with less 
 
 **Output**
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/GraphCypherQAChain_results.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/retrievalQA_results.png)
 
 It is only finding a product that does not contain the ingredient called retinol, but not products that are moisturizers. Running this same query again may not generate any result.
 
@@ -251,9 +247,7 @@ It is only finding a product that does not contain the ingredient called retinol
 
 **Output**
 
-<figure>
-  <img width="50%" height="auto" src="/src/posts/knowledge-graph-rag/images/define_query.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/define_query.png)
 
 In my opinion, I feel such method works best in certain contexts, such as a product recommendation system, where we know users are asking questions to find products. We most likely expect users to provide details describing the ideal products they have in mind through their needs. 
 If the context is around a Q&A about a person or event, users may probe with general queries that is difficult to provide labels for.
@@ -325,9 +319,7 @@ Now, we will query for similar products based on the LLM-generated object of ent
 
 **Output**
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/query_entities.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/query_entities.png)
 
 Next, we will query for similar products based on a given description. Similarity is based on a product title, since that was the only property embedded on a Product node. Hence, it is more convenient to verify the search results. **Since we have two types of nodes, Product and Entity, with different set of properties embedded, we have to separate the queries.**
 
@@ -354,9 +346,7 @@ Next, we will query for similar products based on a given description. Similarit
 
 <br/>
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/query_product.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/query_product.png)
 
 ## Building a Langchain agent
 Now, we can stitch together the similarity search components. This may generate made-up responses not relevant to the skincare products dataset I ingested into the graph database. Agent prompt engineering is also an additional complexity. You may view [full code of the agent setup here](https://github.com/dianaow/products-knowledge-graph/blob/main/llm_kg.ipynb)
@@ -383,9 +373,7 @@ tool_names = [f"{tool.name}: {tool.description}" for tool in tools]
 
 **Output**
 
-<figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/agent.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/agent.png)
 
 ### Non-LLM generated search response
 Using an agent did not generate good responses. Let's keep it 'traditional' by running each search component in sequence in a pipeline.
@@ -425,6 +413,4 @@ Using an agent did not generate good responses. Let's keep it 'traditional' by r
 
 **Output**
 
-<figure>
-  <img width="50%" height="auto" src="/src/posts/knowledge-graph-rag/images/search_pipeline.png" />
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/search_pipeline.png)

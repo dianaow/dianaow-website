@@ -271,9 +271,7 @@ Let's visualize the output in Neo4j and check our results.
 
 <br/>
 
-<figure>
-  <img src="/src/posts/knowledge-graph-llm/images/graph.png" alt="Snapshot of graph"/>
-</figure>
+![Graph overview](/src/posts/knowledge-graph-llm/images/graph.png)
 
 The prompt above does not perform coreference resolution at all, as we can see separate nodes for "Chiang", "Chiang Kai-Shek", "Chiang Wei-Kuo" and "Chiang Ching-Kuo". These three people share the same surname. In their Wikipedia pages, 'Chiang' is used to refer to each of them.
 
@@ -283,9 +281,7 @@ Fine-tuning the prompt may help, such as warning it about the problem through ex
 
 <br/>
 
-<figure>
-  <img src="/src/posts/knowledge-graph-llm/images/graph-error.png" alt="Snapshot of graph"/>
-</figure>
+![Graph overview](/src/posts/knowledge-graph-rag/images/graph-error.png)
 
 ## Additional pre-extraction steps
 ### Summarization
