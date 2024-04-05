@@ -1,0 +1,98 @@
+@import '@fontsource/poppins';
+@import '@fontsource/inter';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  p {
+    @apply text-base text-slate-300 mt-5 mb-2 leading-loose;
+    @apply lg:text-lg;
+  }
+  li, a {
+    @apply text-sm text-indigo-300 mt-2;
+    @apply lg:text-base;
+  }
+  h1 {
+    @apply text-3xl text-indigo-400 mt-2;
+    @apply sm:text-4xl mt-4;
+    @apply lg:text-6xl mt-8;
+  }
+  h2 {
+    @apply text-2xl text-indigo-400 mt-12;
+    @apply lg:text-4xl mt-20;
+  }
+  h3 {
+    @apply text-lg text-slate-200 mt-10;
+    @apply lg:text-2xl mt-16;
+  }
+  h4 {
+    @apply text-sm text-indigo-300 mt-2 mb-1;
+    @apply lg:text-lg mt-4;
+  }
+  strong {
+    @apply font-black
+  }
+  button {
+    @apply text-xs my-1 mr-2 bg-transparent border-indigo-400 text-indigo-400 border rounded-full px-4 py-2 hover:bg-indigo-400 hover:text-white hover:border-indigo-400 transition duration-300 ease-in-out;
+  }
+}
+
+html,
+body {
+	height: 100%;
+  background-color: theme(colors.slate.950);
+}
+
+ul,
+ol {
+	padding-left: 10px;
+  list-style-type: disc;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Poppins', sans-serif;
+}
+
+p, ul, li {
+  font-family: 'Inter', sans-serif;
+}
+
+pre {
+	padding: 1rem;
+	border-radius: 8px;
+	tab-size: 2;
+  margin: 0.5rem 0rem 2rem 0rem;
+}
+
+:not(pre) > code {
+  background-color: theme(colors.slate.800);
+  padding: 0.3em;
+  border-radius: 8px;
+}
+
+blockquote {
+  margin: 1.8rem 0rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border-top: 6px solid theme(colors.indigo.600);
+  background-color: theme(colors.indigo.900);
+  opacity: 0.8;
+}
+
+.code-block-title {
+  font-weight: bold;
+  margin-top: 2em;
+  color: theme(colors.slate.200);
+}
+
+figure {
+  margin: 2rem;
+}
+
+figcaption {
+  text-align: center;
+  font-size: 10px;
+  color: white;
+}
