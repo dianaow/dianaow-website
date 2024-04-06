@@ -10,11 +10,22 @@ categories:
 published: true
 ---
 
-## Introducing Medusa.js
+<script lang="ts">
+  import supabase_dashboard from './images/supabase_dashboard.png'
+  import stripe_dashboard from './images/stripe_dashboard.png'
+  import medusa_admin_region from './images/medusa_admin_region.png'
+  import stripe_payment_details from './images/stripe_payment_details.png'
+</script>
+
+<br/><br/>
 
 In this article, I will explain how to build a checkout and payment flow with Medusa.js inside a Sveltekit e-commerce application. 
 
 Medusa.js is a JavaScript framework designed specifically for building ecommerce applications. It comes with features and functionality tailored to the needs of ecommerce applications, such as product management, inventory management, checkout processes, and payment gateways.
+
+I used [pevey's sveltekit medusa starter](https://github.com/pevey/sveltekit-medusa-starter) as the starting point of my e-commerce application, but because it is not longer maintained, I made changes to the code on my own, such as decoupling the starter from [pevey's sveltekit-medusa-client](https://github.com/pevey/sveltekit-medusa-client).
+
+[Github repo](https://github.com/dianaow/sveltekit-ecommerce) | [Live site](https://sveltekit-ecommerce-two.vercel.app/)
 
 ## Preparation 
 
@@ -26,12 +37,12 @@ To help you troubleshoot with convenience, particularly so when are there are mu
 4. Postman Desktop to make calls on Medusa's APIs directly
 
 <figure>
-  <img src="/src/posts/sveltekit-ecommerce-checkout/images/supabase_dashboard.png" alt="A snapshot of a supabase project dashboard"/>
+  <img src={supabase_dashboard} alt="A snapshot of a supabase project dashboard"/>
   <figcaption>Supabase Project Dashboard</figcaption>
 </figure>
 
 <figure>
-  <img src="/src/posts/sveltekit-ecommerce-checkout/images/stripe_dashboard.png" alt="A snapshot of a stripe dashboard"/>
+  <img src={stripe_dashboard} alt="A snapshot of a stripe dashboard"/>
   <figcaption>Stripe Dashboard</figcaption>
 </figure>
 
@@ -88,7 +99,7 @@ Do not forget to add Stripe as one of the payment providers, which can be done f
 *[Medusa's Documentation on Stripe plugin setup](https://docs.medusajs.com/plugins/payment/stripe)*.
 
 <figure>
-  <img src="/src/posts/sveltekit-ecommerce-checkout/images/medusa_admin_region.png" alt="A snapshot of Medusa Admin dashboard"/>
+  <img src={medusa_admin_region} alt="A snapshot of Medusa Admin dashboard"/>
   <figcaption>Medusa Admin Dashboard</figcaption>
 </figure>
 
@@ -171,7 +182,8 @@ Inside the product page, create a button. To invoke the named action inside `rou
 
 ```html (routes/product/[slug]/+page.svelte)
   <form action="/cart?/add" method="post">
-  <button type="submit">
+     input type="hidden" name="variantId" value="{product.variants[product.variants.findIndex(v => v.id === selectedVariantId)].id}" />
+    <button type="submit">
       Add to Cart
     </button>
   </form>
@@ -375,7 +387,7 @@ As the last step, on the server, upon a form submission, an action is taken to c
 ```
 
 <figure>
-  <img src="/src/posts/sveltekit-ecommerce-checkout/images/stripe_payment_details.png" alt="Check stripe payment details"/>
+  <img src={stripe_payment_details} alt="Check stripe payment details"/>
   <figcaption>Stripe payment details</figcaption>
 </figure>
 

@@ -9,6 +9,12 @@ categories:
 published: true
 ---
 
+<script lang="ts">  
+  import largescale_pixi_graph from './images/largescale_pixi_graph.png'
+  import dynamic_graph from './images/dynamic_graph.mov'
+  import static_graph from './images/static_graph.mov'
+</script>
+
 <br/><br/>
 
 In this blog post, we will explore how to create a force-directed graph using the latest versions of two libraries: PIXI.js v7 and D3 v7. By combining the rendering capabilities of PIXI.js with the force simulation abilities of D3.js, particularly the d3-force module, you can build performant force-directed graphs for your web applications.
@@ -21,7 +27,7 @@ Readers should have some experience with D3.js and the d3-force module. Basic kn
 
 <br/>
 <figure>
-<img src="/src/posts/pixijs-d3-graph/images/largescale_pixi_graph.png" alt="Snapshop of PIXI.js graph"/>
+<img src={largescale_pixi_graph} alt="Snapshop of PIXI.js graph"/>
 </figure>
 
 ## Getting Started
@@ -687,7 +693,7 @@ Eventually, nodes gradually settle into their final positions, but depending on 
 ```javascript
   simulation.on("tick", () => updatePositions())
 ```
-<video width="90%" height="auto" src="/src/posts/pixijs-d3-graph/images/dynamic_graph.mov" autoplay loop playsinline muted></video>
+<video width="90%" height="auto" src={dynamic_graph} autoplay loop playsinline muted></video>
 </div>
 
 <div style="max-width:50%; padding: 1rem;">
@@ -706,7 +712,7 @@ This line of code determines the number of iterations needed for a D3.js force s
 
   updatePositions();
 ```
-<video width="90%" height="auto" src="/src/posts/pixijs-d3-graph/images/static_graph.mov" autoplay loop playsinline muted></video>
+<video width="90%" height="auto" src={static_graph} autoplay loop playsinline muted></video>
 </div>
 </div>
 

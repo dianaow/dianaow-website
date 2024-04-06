@@ -10,6 +10,11 @@ categories:
 published: true
 ---
 
+<script lang="ts">  
+  import graph from './images/graph.png'
+  import graph_error from './images/graph-error.png'
+</script>
+
 <br/><br/>
 
 This article aims to chronicle my process in understanding LLMs and their practical applications as a web developer. 
@@ -267,11 +272,11 @@ We need to interate over the chunks, generate a response from each of them, then
 
 ## Graph visualization
 
-Let's visualize the output in Neo4j and check our results.
-
 <br/>
 
-![Graph overview](/src/posts/knowledge-graph-llm/images/graph.png)
+<figure>
+  <img src={graph} alt="Snapshot of graph"/>
+</figure>
 
 The prompt above does not perform coreference resolution at all, as we can see separate nodes for "Chiang", "Chiang Kai-Shek", "Chiang Wei-Kuo" and "Chiang Ching-Kuo". These three people share the same surname. In their Wikipedia pages, 'Chiang' is used to refer to each of them.
 
@@ -281,7 +286,9 @@ Fine-tuning the prompt may help, such as warning it about the problem through ex
 
 <br/>
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/graph-error.png)
+<figure>
+  <img src={graph_error} alt="Snapshot of graph"/>
+</figure>
 
 ## Additional pre-extraction steps
 ### Summarization

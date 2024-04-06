@@ -21,7 +21,7 @@
   <!-- Tags -->
 	<div class="tags">
 		{#each data.meta.categories as category}
-			<button>&num;{category}</button>
+			<button>{category}</button>
 		{/each}
 	</div>
 

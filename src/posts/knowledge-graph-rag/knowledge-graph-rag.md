@@ -10,6 +10,18 @@ categories:
 published: true
 ---
 
+<script lang="ts">
+  import graph_overview from './images/graph_overview.png'
+  import graph_index from './images/graph_index.png'
+  import retrievalQA_results from './images/retrievalQA_results.png'
+  import GraphCypherQAChain_results from './images/GraphCypherQAChain_results.png'
+  import define_query from './images/define_query.png'
+  import query_entities from './images/query_entities.png'
+  import query_product from './images/query_product.png'
+  import agent from './images/agent.png'
+  import search_pipeline from './images/search_pipeline.png'
+</script>
+
 <br/><br/>
 
 As mentioned in my previous article, we can construct a knowledge graph (KG) with the help of LLMs. **This knowledge graph now becames an external knowledge source for the LLM. We can use this KG, with its structured and unstructured parts, to augment an LLM response.**
@@ -74,7 +86,9 @@ Create a Neo4j database, connect to it and ingest the graph data into it.
 
 <br/>
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/graph_overview.png)
+<figure>
+  <img width="100%" height="auto" src={graph_overview} />
+</figure>
 
 ## Creating vector indexes in Neo4j
 
@@ -126,7 +140,9 @@ While all properties can technically be emdedded, only properties whose values a
 
 <br/>
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/graph_index.png)
+<figure>
+  <img width="100%" height="auto" src={graph_index} />
+</figure>
 
 ## Querying the vector indexes
 
@@ -144,10 +160,8 @@ This is a standard snippet of code found in most LangChain Chatbot tutorials. It
 <br/>
 
 <figure>
-  <img width="100%" height="auto" src="/src/posts/knowledge-graph-rag/images/retrievalQA_results.png" />
+  <img width="100%" height="auto" src={retrievalQA_results} />
 </figure>
-
-![Graph overview](/src/posts/knowledge-graph-rag/images/graph_overview.png)
 
 ## Querying Neo4j database
 
@@ -179,7 +193,9 @@ While a really cool functionality, it is error prone, particularly so with less 
 
 **Output**
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/retrievalQA_results.png)
+<figure>
+  <img width="100%" height="auto" src={GraphCypherQAChain_results} />
+</figure>
 
 It is only finding a product that does not contain the ingredient called retinol, but not products that are moisturizers. Running this same query again may not generate any result.
 
@@ -247,7 +263,9 @@ It is only finding a product that does not contain the ingredient called retinol
 
 **Output**
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/define_query.png)
+<figure>
+  <img width="60%" height="auto" src={define_query} loading="lazy" />
+</figure>
 
 In my opinion, I feel such method works best in certain contexts, such as a product recommendation system, where we know users are asking questions to find products. We most likely expect users to provide details describing the ideal products they have in mind through their needs. 
 If the context is around a Q&A about a person or event, users may probe with general queries that is difficult to provide labels for.
@@ -319,7 +337,9 @@ Now, we will query for similar products based on the LLM-generated object of ent
 
 **Output**
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/query_entities.png)
+<figure>
+  <img width="80%" height="auto" src={query_entities} loading="lazy"/>
+</figure>
 
 Next, we will query for similar products based on a given description. Similarity is based on a product title, since that was the only property embedded on a Product node. Hence, it is more convenient to verify the search results. **Since we have two types of nodes, Product and Entity, with different set of properties embedded, we have to separate the queries.**
 
@@ -346,7 +366,9 @@ Next, we will query for similar products based on a given description. Similarit
 
 <br/>
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/query_product.png)
+<figure>
+  <img width="80%" height="auto" src={query_product} loading="lazy" />
+</figure>
 
 ## Building a Langchain agent
 Now, we can stitch together the similarity search components. This may generate made-up responses not relevant to the skincare products dataset I ingested into the graph database. Agent prompt engineering is also an additional complexity. You may view [full code of the agent setup here](https://github.com/dianaow/products-knowledge-graph/blob/main/llm_kg.ipynb)
@@ -373,7 +395,9 @@ tool_names = [f"{tool.name}: {tool.description}" for tool in tools]
 
 **Output**
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/agent.png)
+<figure>
+  <img width="80%" height="auto" src={agent} loading="lazy" />
+</figure>
 
 ### Non-LLM generated search response
 Using an agent did not generate good responses. Let's keep it 'traditional' by running each search component in sequence in a pipeline.
@@ -413,4 +437,6 @@ Using an agent did not generate good responses. Let's keep it 'traditional' by r
 
 **Output**
 
-![Graph overview](/src/posts/knowledge-graph-rag/images/search_pipeline.png)
+<figure>
+  <img width="80%" height="auto" src={search_pipeline} loading="lazy" />
+</figure>
