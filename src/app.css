@@ -7,35 +7,40 @@
 
 @layer components {
   p {
-    @apply text-base text-slate-300 mt-5 mb-2 leading-loose;
+    @apply text-sm text-slate-300 mt-5 mb-2 leading-loose;
+    @apply md:text-base;
     @apply lg:text-lg;
   }
   li, a {
-    @apply text-sm text-indigo-300 mt-2;
+    @apply text-xs text-indigo-300 mt-2;
+    @apply md:text-sm;
     @apply lg:text-base;
   }
   h1 {
     @apply text-3xl text-indigo-400 mt-2;
-    @apply sm:text-4xl mt-4;
-    @apply lg:text-6xl mt-8;
+    @apply md:text-4xl mt-4;
+    @apply xl:text-6xl mt-8;
   }
   h2 {
-    @apply text-2xl text-indigo-400 mt-12;
-    @apply lg:text-4xl mt-20;
+    @apply text-xl text-indigo-400 mt-8;
+    @apply md:text-3xl mt-14;
+    @apply xl:text-4xl mt-20;
   }
   h3 {
-    @apply text-lg text-slate-200 mt-10;
-    @apply lg:text-2xl mt-16;
+    @apply text-base text-slate-200 mt-0;
+    @apply md:text-lg mt-12;
+    @apply xl:text-2xl mt-16;
   }
   h4 {
-    @apply text-sm text-indigo-300 mt-2 mb-1;
-    @apply lg:text-lg mt-4;
+    @apply text-xs text-indigo-300 mt-0;
+    @apply md:text-base mt-2;
+    @apply xl:text-lg mt-4;
   }
   strong {
     @apply font-black
   }
   button {
-    @apply text-xs my-1 mr-2 bg-transparent border-indigo-400 text-indigo-400 border rounded-full px-4 py-2 hover:bg-indigo-400 hover:text-white hover:border-indigo-400 transition duration-300 ease-in-out;
+    @apply text-xs my-2 mr-2 bg-transparent border-indigo-400 text-indigo-400 border rounded-full px-4 py-2 hover:bg-indigo-400 hover:text-white hover:border-indigo-400 transition duration-300 ease-in-out;
   }
 }
 

@@ -1,7 +1,7 @@
 ---
 title: Constructing a knowledge graph from text with Large Language Models (LLMs)
 description: Because it is convenient to do so with LLMs and LangChain (though creating a quality knowledge graph may be challenging!)
-date: '2024-3-21'
+date: '2024-1-11'
 categories:
   - Python
   - OpenAI (free tier)

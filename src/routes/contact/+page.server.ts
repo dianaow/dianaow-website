@@ -13,7 +13,7 @@ export const actions: Actions = {
     const body = {
       name: data.get('name') as string,
       email: data.get('email') as string,
-      message: data.get('name') as string
+      message: data.get('message') as string
     }
 
     const rows = Object.values(body)

@@ -1,7 +1,7 @@
 ---
 title: Implementing Retrieval-Augmented Generation (RAG) with Knowledge Graph
 description: Use a KG, with its structured and unstructured parts, to augment an LLM response to enhance it's accuracy
-date: '2024-3-21'
+date: '2024-2-6'
 categories:
   - Python
   - OpenAI (free tier)

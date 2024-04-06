@@ -1,7 +1,7 @@
 ---
 title: Creating a large-scale interactive force-directed graph
 description: Combining the rendering capabilities of PIXI.js with the force simulation abilities of D3.js
-date: '2024-3-21'
+date: '2023-10-29'
 categories:
   - D3.js
   - PIXI.js

@@ -1,7 +1,7 @@
 ---
 title: Creating a checkout flow of an e-commerce application with Sveltekit and MedusaJS
 description: Learn how to create your own e-commerce store by first mastering the Stripe payment and checkout flow. Learn how to make successful payments and capture orders with shipping options.
-date: '2024-3-21'
+date: '2024-4-6'
 categories:
   - sveltekit
   - svelte

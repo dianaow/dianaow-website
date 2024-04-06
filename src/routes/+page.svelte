@@ -23,7 +23,7 @@
 
   <h2 class='mt-8 md:mt-20'>Dashboards</h2>   
 
-  <div class='block md:flex p-8'>      
+  <div class='block md:flex p-4'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={biovitals_demo}>
       <a href="https://www.biofourmis.com/care-delivery" target="_blank">
@@ -45,7 +45,7 @@
       </a>
     </div>
   </div>
-  <div class='block md:flex p-8 pb-16'>      
+  <div class='block md:flex p-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={svelte_dashboard}>
       <a href="https://www.biofourmis.com/care-delivery" target="_blank">
@@ -70,7 +70,7 @@
 
   <h2>Network Visualizations</h2> 
 
-  <div class='block md:flex p-8 pb-16'>      
+  <div class='block md:flex p-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={vizforsocialgood_network}>
       <a href="https://vizforsocialgood-network.netlify.app/" target="_blank">
@@ -95,7 +95,7 @@
   
   <h2>Geospatial</h2> 
 
-  <div class='block md:flex p-8 pb-16'>      
+  <div class='block md:flex p-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={leaflet_dash_map} loading="lazy">
       <a href="" target="_blank">
@@ -128,13 +128,13 @@
     
   <h2>The unusual</h2> 
 
-  <div class='block md:flex p-8 pb-16'>      
+  <div class='block md:flex p-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={d3_force} loading="lazy">
       <a href="https://d3-force-collection.netlify.com" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>d3-force compilation</h2>
-          <h3>A compilation of d3-force simulations: their use cases and the creation methods behind them.</h3>
+          <h4>A compilation of d3-force simulations: their use cases and the creation methods behind them.</h4>
         </div>
       </a>
     </div>
@@ -144,7 +144,7 @@
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>Data Visualization Society members in 2020</h2>
           <p>PixiJS</p>
-          <h4>The Data Visualization Society released their 2020 survey results and I participated in visualizing the results, choosing to represent all respondents as animating and interactive dots on the screen. I wanted audiences to be able to find out how represented they are in the data viz community based on their skillset.</h4>
+          <h4>The Data Visualization Society released their 2020 survey results and I participated in visualizing the results, choosing to represent all respondents as animating and interactive dots on the screen.</h4>
         </div>
       </a>
     </div>
