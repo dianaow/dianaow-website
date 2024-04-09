@@ -9,6 +9,7 @@
 	<title>{data.meta.title}</title>
 	<meta property="og:type" content="article" />
 	<meta property="og:title" content={data.meta.title} />
+	
 </svelte:head>
 
 <article class="container px-8 md:px-12 py-4 md:py-8 min-h-screen">

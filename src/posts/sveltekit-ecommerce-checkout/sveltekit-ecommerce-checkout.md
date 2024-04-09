@@ -111,7 +111,7 @@ Create a cart route by creating a folder 'cart' inside the routes directory with
 
 In the page, specify named actions that you require for cart manipulation. Each action receives a `RequestEvent` object, allowing you to read the data with `request.formData()`.
 
-When creating a cart, attach a customer_id and email to it. These parameters can only be found in the update method, so after creating a cart, make another call to update the cart with the customer_id and email address. I found that this prevents multiple Stripe PaymentIntents from being created along the way as the customer progresses through each stage of the checkout to payment process. Payment intents will be explained later on.
+When creating a cart, associate a customer's identification (customer_id and email) to it. These parameters can only be found in the update method, so after creating a cart, make another call to update the cart with the customer_id and email address of the logged-in user. This prevents multiple Stripe PaymentIntents from being created along the way as the customer progresses through each stage of the checkout to payment process. Payment intents will be explained later on. I found attaching customer's identification to a cart necessary to have payment status be 'captured' instead of 'awaiting'. If a guest user, no customer_id and email can be found, so this will be dealt with at the checkout page before a payment intent is made. 
 
 
 ```svelte (routes/cart/+page.server.ts)
@@ -138,29 +138,31 @@ When creating a cart, attach a customer_id and email to it. These parameters can
 
   async function createCart(locals: any, cookies: any) {
     try {
-     let { cart } = await medusa.carts.create()
-      .then((res) => res)
-      .catch((e) => console.log(e))
+      let { cart } = await medusa.carts.create()
+        .then((res) => res)
+        .catch((e) => console.log(e))
 
-     cart = await medusa.carts.update(cart.id, {
-       customer_id: locals.user.id,
-       email: locals.user.email
-     })
-     .then(({ cart }) => cart)
-     .catch((e) => console.log(e))
- 
-     cookies.set('cartid', cart.id, {
-       path: '/',
-       maxAge: 60 * 60 * 24 * 400,
-       sameSite: 'strict',
-       httpOnly: true,
-       secure: true
-     });
-     locals.cartid = cart.id;
-     if (cart) return cart.id
+      if(locals && locals.user) {
+        cart = await medusa.carts.update(cart.id, {
+          customer_id: locals.user.id,
+          email: locals.user.email
+        })
+        .then(({ cart }) => cart)
+        .catch((e) => console.log(e))  
+      }
+      
+      cookies.set('cartid', cart.id, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 400,
+        sameSite: 'strict',
+        httpOnly: true,
+        secure: true
+      });
+      locals.cartid = cart.id;
+      if (cart) return cart.id
     } catch (error) {
-     console.error('Error creating cart:', error);
-     return null;
+      console.error('Error creating cart:', error);
+      return null;
     }
   }
   
@@ -199,20 +201,20 @@ Inside the cart component `lib/components/Cart.svelte`, create a button. To invo
 
 ```html (lib/components/Cart.svelte)
   <form action="/checkout" method="post">
-  <button type="submit">
+    <button use:close type="submit">
       Checkout
     </button>
   </form>
 ```
 
-The stripe plugin has to be installed correctly for any cart-related API calls to run without error. Before the checkout page `routes/checkout/+page.svelte` is rendered, the server load function will return variables which is available to the page via the data prop. We want the checkout page to have data of the current customer and cart.
-
 ### **Server side steps:**
-#### 1. Create payment sessions for each Payment Processor (eg. Stripe) available in region associated with cart. For Stripe, a Payment  
-#### 2. Intent associated with the customer is created simultaneously.
+#### 1. Create payment sessions for each Payment Processor (eg. Stripe) available in region associated with cart. 
+#### 2. For Stripe, a Payment Intent associated with the customer is created simultaneously.
 #### 3. Select and set a payment session (This is only required if there are more than one Payment Processors)
 #### 4. Extract shipping options associated with cart (Different regions may have different shipping methods)
 #### 5. Set a default shipping option
+
+The stripe plugin has to be installed correctly for any cart-related API calls to run without error. Before the checkout page `routes/checkout/+page.svelte` is rendered, the server load function will return variables which is available to the page via the data prop. We want the checkout page to have data of the current customer and cart.
 
 If you check the cart object, the data attribute nested inside the payement session attribute, will hold the payment intent among other data necessary to authorize the payment.
 
@@ -224,8 +226,18 @@ If you check the cart object, the data attribute nested inside the payement sess
   export const load: PageServerLoad = async function ({ locals }) {
     if (!locals.user) throw redirect(302, '/auth?rurl=checkout')
       
-    if (!locals.cartid) {
-      return false;
+    if (!locals.cartid || locals.cartid === '') {
+        return {props: {}}
+    }
+    
+    let cart
+    if(locals.user) {
+        cart = await medusa.carts.update(locals.cartid, {
+          customer_id: locals.user.id,
+          email: locals.user.email
+        })
+        .then(({ cart }) => cart)
+        .catch((e) => console.log(e))     
     }
     
     let cart = await medusa.carts.createPaymentSessions(locals.cartid)
@@ -290,6 +302,79 @@ In your payment page, initialize Stripe and add a `<Elements>` component to rend
     stripe = await loadStripe(PUBLIC_STRIPE_KEY)
   })
 </script>
+```
+
+Initially pre-populate the address fields with one of the customer's saved addresses, if any, for checkout convenience. A Medusa API call will be not be made to add this address to the customer's profile, unless any of the fields is different from the current address. A separate Medusa API call will be made to update the cart with the populated address as the shipping address.
+Pay attention to the data structure of the contact and address information for both the Medusa API and Stripe API, they have to be provided accurately.
+
+```svelte
+   if (user.shipping_addresses) {
+      for (let address of user.shipping_addresses) {
+         contacts.push({
+            firstName: address.first_name,
+            lastName: address.last_name,
+            address: {
+               line1: address.address_1,
+               line2: address.address_2,
+               city: address.city,
+               state: address.province,
+               postal_code: address.postal_code,
+               country: address.country_code.toUpperCase(),
+            }
+         })
+      }
+   }
+
+  // triggered upon payment button. value contains values from all form fields
+  const saveAddress = async (value: any) => {
+    let address = {
+        first_name: value?.firstName,
+        last_name: value?.lastName,
+        address_1: value?.address?.line1,
+        address_2: value?.address?.line2,
+        city: value?.address?.city,
+        province: value?.address?.state,
+        postal_code: value?.address?.postal_code,
+        country_code: value?.address?.country.toLowerCase(),
+    }
+
+    let newAddress = true
+
+    for (let existing of user.shipping_addresses) {
+      const existing_address = {
+          first_name: existing.first_name,
+          last_name: existing.last_name,
+          address_1: existing.address_1, 
+          address_2: existing.address_2, 
+          city: existing.city, 
+          province: existing.province, 
+          postal_code: existing.postal_code, 
+          country_code: existing.country_code
+      }
+      if (JSON.stringify(address) === JSON.stringify(existing_address)) {
+          newAddress = false
+      }
+    }
+
+    if (newAddress) {
+      // medusa.customers.addresses.addAddress({ address })
+      const success = await fetch('/checkout/save-address', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(address)
+      })
+      .then(res => res.ok)
+      .catch((e) => console.log(e))
+      if (!success) return false
+    }
+    // medusa.carts.update(locals.cartid, {shipping_address: address})
+    return await fetch('/checkout/shipping-address', { 
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(address) })
+    .then(res => res.json())
+    .catch((e) => console.log(e))
+  }
 ```
 
 Be careful with specfiying method parameters in `stripe.confirmPayment` function, or else the payment status may not be what you want. Either provide the **elements** parameter OR the **confirmParams** parameter. Since the Stripe Elements instance created already binds the form context with `binds:elements`, including the client_secret, use it.
