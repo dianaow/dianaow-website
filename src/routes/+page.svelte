@@ -36,11 +36,11 @@
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={fifa19_binned}>
-      <a href="https://sveltekit-dashboard.netlify.app/" target="_blank">
+      <a href="https://www.biofourmis.com/care-delivery" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Interactive dashboard for Web3 gaming company</h2>
-          <p>Sveltekit + D3.js</p>
-          <h4>Data is filterable by date and region. As the line chart is zoomed out, the x-axis domain becomes less granular, transitioning from 10-minute intervals to 1-week intervals, while asynchronously extracting new data from an API.</h4>
+          <h2 class='m-0'>FIFA 19</h2>
+          <p>React + D3.js</p>
+          <h4>Visualizing data from the football simulation video game 'FIFA 19'</h4>
         </div>
       </a>
     </div>
@@ -48,11 +48,11 @@
   <div class='block md:flex p-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
       <img src={svelte_dashboard}>
-      <a href="https://www.biofourmis.com/care-delivery" target="_blank">
+      <a href="https://sveltekit-dashboard.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Data viz library for a healthcare tech company</h2>
-          <p>D3.js</p>
-          <h4>Developed and maintained Biofourmis' data visualization library, introducing advanced chart types and enhanced interactive features befitting of high dimensional medical data.</h4>
+          <h2 class='m-0'>Interactive dashboard for Web3 gaming company</h2>
+          <p>Sveltekit + D3.js</p>
+          <h4>Data is filterable by date and region. As the line chart is zoomed out, the x-axis domain becomes less granular, transitioning from 10-minute intervals to 1-week intervals, while asynchronously extracting new data from an API.</h4>
         </div>
       </a>
     </div>
