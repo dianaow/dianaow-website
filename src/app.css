@@ -33,11 +33,11 @@
   }
   h4 {
     @apply text-xs text-indigo-300 mt-0;
-    @apply md:text-base mt-2;
-    @apply xl:text-lg mt-4;
+    @apply md:text-base mt-8;
+    @apply xl:text-lg mt-6;
   }
   strong {
-    @apply font-black
+    @apply font-extrabold;
   }
   button {
     @apply text-xs my-2 mr-2 bg-transparent border-indigo-400 text-indigo-400 border rounded-full px-4 py-2 hover:bg-indigo-400 hover:text-white hover:border-indigo-400 transition duration-300 ease-in-out;
@@ -64,15 +64,20 @@ p, ul, li {
   font-family: 'Inter', sans-serif;
 }
 
+li { 
+  padding-left: 30px;
+}
+
 pre {
 	padding: 1rem;
 	border-radius: 8px;
 	tab-size: 2;
-  margin: 0.5rem 0rem 2rem 0rem;
+  margin: 4rem 0rem 4rem 0rem;
 }
 
 :not(pre) > code {
   background-color: theme(colors.slate.800);
+  color: white;
   padding: 0.3em;
   border-radius: 8px;
 }
@@ -92,6 +97,34 @@ blockquote {
   color: theme(colors.slate.200);
 }
 
+.tier1 {
+  font-weight: 900;
+  background-color: navy;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 6px;
+  border: 1px solid  navy;
+}
+
+.tier2 {
+  font-weight: 900;
+  background-color: royalblue;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 6px;
+  border: 1px solid royalblue;
+}
+
+.tier3 {
+  font-weight: 900;
+  background-color: lightskyblue;
+  color: black;
+  padding: 1px 4px;
+  border-radius: 6px;
+  border: 1px solid lightskyblue;
+}
+
+
 figure {
   margin: 2rem;
 }
@@ -100,4 +133,11 @@ figcaption {
   text-align: center;
   font-size: 10px;
   color: white;
+}
+pre {
+  max-width: 100%; /* Set the max-width as per your layout */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  padding: 1rem; /* Optional: Add some padding */
+  border: 1px solid white; /* Optional: Add a border */
+  border-radius: 8px; /* Optional: Add rounded corners */
 }

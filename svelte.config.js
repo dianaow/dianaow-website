@@ -68,7 +68,7 @@ const mdsvexOptions = {
 }
 
 const config = {
-	extensions: ['.svelte', '.md'],
+	extensions: ['.svelte', '.svx', '.md'],
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 	kit: {
 		adapter: adapter()

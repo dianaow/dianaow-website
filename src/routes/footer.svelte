@@ -40,8 +40,10 @@
   <div class="col-span-1"></div>
   <div class="col-span-1 space-y-2 flex flex-col justify-between">
     <div class="pb-8 space-y-2">
-      <p class="font-bold">EMAIL</p>
-      <p>diana.ow[@]outlook[.]com</p>
+      <p class="text-xl font-bold">Please reach out to me on 
+      <a class="text-xl" href="https://contra.com/dianaow_viz" target="_blank">Contra</a> or 
+      <a  class="text-xl"href="https://www.upwork.com/freelancers/dianaow" target="_blank">Upwork</a> 
+      if you are interested to hire me or work together on a project!</p>
     </div>
     <div class="mt-8 flex space-x-10">
       <a href="https://github.com/dianaow" class="text-gray-400 hover:text-gray-500">
