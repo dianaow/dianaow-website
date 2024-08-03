@@ -14,7 +14,6 @@
         const observer = new IntersectionObserver((entries, observer) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              console.log("INTERSECFTING")
               // Use entry.target to access the element that triggered the intersection
               const videoPlaceholder = entry.target;
 

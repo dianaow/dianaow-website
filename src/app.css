@@ -8,13 +8,13 @@
 @layer components {
   p {
     @apply text-sm text-slate-300 mt-5 mb-2 leading-loose;
-    @apply md:text-base;
-    @apply lg:text-lg;
+    @apply md:text-lg;
+    @apply lg:text-xl;
   }
   li, a {
     @apply text-xs text-indigo-300 mt-2;
-    @apply md:text-sm;
-    @apply lg:text-base;
+    @apply md:text-base;
+    @apply lg:text-lg;
   }
   h1 {
     @apply text-3xl text-indigo-400 mt-2;
@@ -27,14 +27,19 @@
     @apply xl:text-4xl mt-20;
   }
   h3 {
-    @apply text-base text-slate-200 mt-0;
-    @apply md:text-lg mt-12;
+    @apply text-lg text-slate-200 mt-0;
+    @apply md:text-xl mt-12;
     @apply xl:text-2xl mt-16;
   }
   h4 {
-    @apply text-xs text-indigo-300 mt-0;
-    @apply md:text-base mt-8;
-    @apply xl:text-lg mt-6;
+    @apply text-base text-indigo-300 mt-0;
+    @apply md:text-lg mt-8;
+    @apply xl:text-xl mt-6;
+  }
+  span {
+    @apply text-xs text-white;
+    @apply md:text-sm;
+    @apply lg:text-base;
   }
   strong {
     @apply font-extrabold;
@@ -72,7 +77,7 @@ pre {
 	padding: 1rem;
 	border-radius: 8px;
 	tab-size: 2;
-  margin: 4rem 0rem 4rem 0rem;
+  margin: 0.5rem 0rem 3.5rem 0rem;
 }
 
 :not(pre) > code {
@@ -138,6 +143,14 @@ pre {
   max-width: 100%; /* Set the max-width as per your layout */
   overflow-x: auto; /* Enable horizontal scrolling */
   padding: 1rem; /* Optional: Add some padding */
-  border: 1px solid white; /* Optional: Add a border */
   border-radius: 8px; /* Optional: Add rounded corners */
+}
+code {
+  position: relative;
+}
+
+.container-code {
+  display: flex;
+  width: 100%;
+  margin: 0rem 0rem 3.5rem 0rem;
 }

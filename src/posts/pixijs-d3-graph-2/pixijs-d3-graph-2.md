@@ -44,7 +44,6 @@ This is the second article of a three-part series delving deep into the creation
 ## What is hierarchical data
 In the context of a hierarchy with three levels, it means that there are three distinct tiers or layers of elements, each one being more specific or subordinate to the one above it. Here's a breakdown of what each level typically represents:
 
-Initialize your project and install PIXI.js and D3.js using npm.
 - Tier 1: This is the highest level in the hierarchy, often considered the most general category. Elements at this level provide a broad classification or grouping. In a hierarchical structure, they serve as the top-level nodes.
 - Tier 2: The second level represents a more specific category or subcategory within the higher-level grouping. Elements at this level are usually subsets of the Tier 1 elements.
 - Tier 3: The third level is the most specific within the hierarchy. Elements at this level are typically individual items or details within the Tier 2 subcategories. They are the most granular and detailed elements in the hierarchy.
@@ -81,7 +80,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
 <p class="text-bold">It's required to save a copy of the original dataset of nodes and links. This backup will prove valuable for implementing the collapsible and expandable functionality since it allows direct manipulation of the nodes and links arrays without affecting the original data.</p>
 <p>To facilitate the distinction of nodes, they can be color-coded and clustered based on their submodule ID. <span class='text-bold'>To differentiate, I have only given <span class='tier1'>SUBMODULE</span> and <span class='tier2'>SEGMENT</span> nodes labels.</span></p>
 
-```javascript
+```javascript (graph.js)
   let nodes = data.nodes.map((d) => {
     return {
       NAME: d.NAME,
@@ -111,7 +110,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
   <img width="100%" height="auto" src={assortment_node_types_labelled} class='mockup'>
 </figure>
 
-```javascript
+```javascript (graph.js)
   let expandedAll = false
   let nodeCollapsedState = {}
 
@@ -154,7 +153,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
   </figure>
 </div>
 
-```javascript
+```javascript (graph.js)
   if (expandedAll === false) {
     nodes = SEGMENTS
     links = getLinksBetweenSegments()
@@ -195,7 +194,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
 
 <p>In addition to introducing new <span class='tier3'>VARIABLES</span>, it also involves creating new connections between these variables. This includes establishing linkages between the <span class='tier3'>VARIABLES</span> and other <span class='tier1'>SUBMODULE</span>, <span class='tier2'>SEGMENT</span>, or <span class='tier3'>VARIABLE</span> nodes, <span class='text-bold'>regardless of whether they belong to the same submodule or a different one.</span></p>
 
-```javascript
+```javascript (graph.js)
 // dblclick on a SEGMENT node to expand into it's variable nodes
 if (d.type === "tier2") {
   // Clicked node
@@ -227,7 +226,7 @@ if (d.type === "tier2") {
 
  - Adding nodes and links:  When clicking on a <span class='tier1'>SUBMODULE</span>, the goal is to display the <span class='tier2'>SEGMENTS</span> and all types of linkages associated with that particular <span class='tier1'>SUBMODULE</span>. The <code>addLinksBwSegmentAndOthers</code> function, serves a similar purpose as the <code>addLinksBwVarAndOthers</code> function. However, it focuses on identifying links connected to the <span class='tier1'>SUBMODULE</span>, and it checks these links for connectivity with other nodes.
 
-```javascript
+```javascript (graph.js)
   // dblclick on SUBMODULE node to expand into it's SEGMENT nodes
   if (d.type === "tier1") {
     // Indicate that submodule node is no longer in collapsed state
@@ -259,7 +258,7 @@ if (d.type === "tier2") {
 <p class="text-bold">How It Works:</p>
 <p>The function achieves this by initially identifying links that should extend from or enter the clicked node. It then iterates over these potential links, checking whether the connecting node is an on-screen <span class='tier1'>SUBMODULE</span>, <span class='tier2'>SEGMENT</span>, or <span class='tier3'>VARIABLE</span>. To make this determination, it relies on the nodes array, which exclusively represents on-screen nodes.</p>
 
-```javascript
+```javascript (graph.js)
     function addLinksBwVarAndOthers(d) {
     // Find links that should branch out from or enter the clicked node
     const linksFromVarToOther = origLinks.filter((link) => link.sourceSubmodule === d["SUBMODULE"] && link.sourceSegment === d["SEGMENT"]);
@@ -363,7 +362,7 @@ if (d.type === "tier2") {
 <p><code>nodeGfx</code> is a PIXI Container of a node, the creation of which is explained in my <a href="https://dianaow.com/posts/pixijs-d3-graph#nodeGfx" target="_blank">previous</a> article.</p>
 <p class="text-bold">The array of nodes and links to render is mutated in-place, the <a href="https://dianaow.com/posts/pixijs-d3-graph#update" target="_blank">update</a> function is called without a need to pass in any data parameters. The update function redraws the PIXI Containers and Sprites representing each node and link. It then 'reheats' the simulation to reactivate the force-directed simulation that governs the positioning and behavior of nodes in the graph.</p>
 
-```javascript
+```javascript (graph.js)
   let clickCount = 0
   
   // Inside the update() function
@@ -401,7 +400,7 @@ if (d.type === "tier2") {
 
 When a user initiates the addition of new nodes by clicking on a submodule or segment node, the current coordinates of that parent node are retrieved. New nodes are then created, and their initial positions are set to match the coordinates of the parent node. This step ensures that the new nodes appear near their parent, which as explained earlier, will be removed from the screen.
 
-```javascript
+```javascript (graph.js)
     // Inside the update() function
     for (let i = 0; i < nodes.length; i++) {
       if (prevNodes.length > 0) {
@@ -463,7 +462,7 @@ When a user initiates the addition of new nodes by clicking on a submodule or se
 <p>I've found that a high repel strength by setting a high <code>forceManyBody</code> charge works well for the initial static graph view, helping to spread out intricate connections between nodes within and across submodules for readabilitiy. However, it's essential to strike a balance. <span class='text-bold'>Using an excessively high repel strength can lead to strong repulsion and increasing distance between nodes on each update, resulting in undesirable effects. To mitigate this, I balance the <code>forceManyBody</code> charge with <code>forceCollide</code></span>. While <code>forceCollide</code> maintains a specified distance between nodes, it doesn't continually push them apart on update, providing a more controlled and visually pleasing layout.</p>
 <p><code>distanceMin</code> is the minimum distance between nodes over which this force is considered. It helps to void an infinitely-strong force if two nodes are exactly coincident. This is important here because when new nodes are introduced, all their initial coordinates match those of the parent node. Without a <code>distanceMin</code> parameter, the repelling force will be applied to these new nodes, and because they share identical positions, causes the infinitely-strong force.</p>
 
-```javascript
+```javascript (graph.js)
   simulation
     .force(
       "charge",

@@ -1,14 +1,27 @@
 ---
-title: Implementing Retrieval-Augmented Generation (RAG) with Knowledge Graph
-description: Use a KG, with its structured and unstructured parts, to augment an LLM response to enhance it's accuracy
-date: '2024-2-6'
+title: Building an OOP-oriented data dashboard
+description: Thoughts about why it's needed and how it can be created
+date: '2024-8-3'
 categories:
-  - Python
-  - OpenAI (free tier)
-  - LangChain
-  - Neo4j
+	- Javascript
 published: true
 ---
+
+<script lang="ts">
+  import CodeContainer1 from './CodeContainer1.svelte';
+	import CodeContainer2 from './CodeContainer2.svelte';
+	import CodeContainer3 from './CodeContainer3.svelte';
+	import CodeContainer4 from './CodeContainer4.svelte';
+	import CodeContainer5 from './CodeContainer5.svelte';
+	import CodeContainer6 from './CodeContainer6.svelte';
+	import CodeContainer7 from './CodeContainer7.svelte';
+	import CodeContainer8 from './CodeContainer8.svelte';
+	import CodeContainer9 from './CodeContainer9.svelte';
+	import Accordion from './Accordion.svelte';
+	import Header from './Header.svelte';
+	import flowchart from './images/flowchart.jpg'
+	import graphview from './images/svg_graphview.png';
+</script>
 
 <br/><br/>
 
@@ -67,7 +80,40 @@ By leveraging OOP principles, you can create a data dashboard that is not only r
 
 
 ## App Flowchart
+<figure>
+  <img width="100%" height="auto" src={flowchart} />
+</figure>
 
+<br/>
+
+<Header title="Chart Context" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/data/ChartContext.js" />
+
+The `ChartContext` class centralizes the management of chart properties using stores. By initializing stores within the context, it ensures that all state changes are managed consistently and efficiently.
+
+#### Purpose:
+- Manage Charts: Keep track of all the charts, allowing for easy addition, removal, and updates.
+- Coordinate Updates: Update configurations and data for all charts from a single place. For example, it sets up and propagate global configurations for all charts, such as default styles or themes.
+- Uniform Behavior: Ensure that all charts adhere to certain standards or behaviors.
+
+```javascript (/src/packages/data/ChartContext.js)
+this.#stores = this.#allProperties.reduce((acc, curr) => {
+    acc[curr] = {
+        store: new ChartContextStore(this.#defaultValues[curr]),
+        ownValue: initialValues.hasOwnProperty(curr),
+    };
+
+    // Freeze always own stores.
+    if (this.#alwaysOwnProperties.has(curr)) {
+        Object.freeze(acc[curr]);
+    }
+
+    return acc;
+}, {});
+```
+
+Each property gets its own store, initialized with a default value.
+`ownValue` determines if the store's value is local to the context or inherited from a parent context.
+In the next setion, we will see how subscriptions ensure that changes in store values are propagated correctly.
 
 ## Subscription model
 The subscription model is used to manage state changes and communication between different parts of an application. The subscription model involves objects (subscribers) registering interest in specific events or changes to another object (publisher). When the publisher changes, it notifies all subscribed objects, allowing them to react accordingly.
@@ -77,7 +123,7 @@ The subscription model is used to manage state changes and communication between
 - Decoupling: Reduces direct dependencies between components, making the system more modular.
 - Reactivity: Ensures that components automatically update in response to relevant changes.
 
-```javascript (ChartContext.js)
+```javascript (/src/packages/data/ChartContext.js)
   subscribe(storeName, handler) {
       // Create object for given store name to store handlers.
       this.#ownSubscribes[storeName] = this.#ownSubscribes[storeName] || new Map();
@@ -95,94 +141,28 @@ The subscription model is used to manage state changes and communication between
   }
 ```
 
-### Detailed breakdown of subscribe method
+### Detailed breakdown
+
+`#ownSubscribes` is a private property of the class that stores subscriptions. It is a dictionary where each key is a store name, and the value is another map that holds a handler (callbacks) and its corresponding unsubscription functions. 
+
 ```javascript
   this.#ownSubscribes[storeName].set(handler, this.store(storeName).subscribe(handler));  
 ```
+The `store` method retrieves the `AppStore` instance associated with storeName.
 
-`#ownSubscribes` is a private property of the class that stores subscriptions. It is a dictionary where each key is a store name, and the value is another map that holds handlers (callbacks) and their corresponding unsubscription functions. 
-
-#### Purpose:
-- **Tracking Subscriptions**: Knowing which handlers are subscribed to which stores.
-- **Unsubscribing Efficiently**: When a chart is removed or reconfigured, you can efficiently unsubscribe the handlers to avoid memory leaks and unexpected behavior.
-
-The `store` method retrieves the **AppStore** instance associated with storeName.
-The subscribe method of the AppStore class is called with handler as the argument. This method registers the handler to be called whenever the store's value changes (ie. when the private setValue method gets triggered). 
-
-#### It's called in two main scenarios:
-- **When the public value setter is used:** The value setter provides a more intuitive way to update the store's value. When you assign a new value to the value property, it triggers the #setValue method.
-- ** When the public set method is used: ** The set method is an alias for the value setter.
-
-
-```javascript (AppStore.js)
-export default class AppStore extends EventDispatcher {
-	#value;
-
-	constructor(value) {
-		super();
-		this.#value = null;
-		this.value = value;
+```javascript (/src/packages/data/ChartContext.js)
+	store(name) {
+		return this.#stores[name].store;
 	}
-
-	/**
-	 * Subscribe to changes with callback function.
-	 * @param {function} callback - Call this function on every change.
-	 * @returns {function} - Function whose call will unsubscribe registered callback.
-	 */
-	subscribe(callback) {
-		callback?.(this.#value, this.#value);
-		return this.addEventListener(AppStoreEventType.CHANGE, ({ data, oldData, target }) => callback(data, oldData, target));
-	}
-
-	/**
-	 * Alias for value setter.
-	 * @param {*} value - Value to set.
-	 */
-	set(value) {
-		this.#setValue(value);
-	}
-	
-	/**
-	 * Set current value.
-	 * @param {*} value - Value to set.
-	 */
-	set value(value) {
-		this.#setValue(value);
-	}
-
-	#setValue(value) {
-		if (Object.is(value, this.#value)) {
-			return;
-		}
-
-		this.#value = value;
-		this.dispatchEvent(new AppEvent(AppStoreEventType.CHANGE, value));
-	}
-
-	/**
-	 * @returns {*} - Current value.
-	 */
-	get value() {
-		return this.#value;
-	}
-
-	/**
-	 * Set value taking return from given function.
-	 * @param {*} fn - Function that returns value to set.
-	 */
-	update(fn) {
-		this.value = fn(this.#value);
-		return this;
-	}
-
-}
 ```
 
+<CodeContainer1></CodeContainer1>
 
-There is a set method in the Chart Context class that sets the value for the store. This is an alias for `this.store(name).set(value)`.
+<br/>
 
+There is a set method in the Chart Context class that sets the store's value. This is an alias for `this.store(name).set(value)`.
 
-```javascript (ChartContext.js)
+```javascript (/src/packages/data/ChartContext.js)
 	/**
 	 * Set store value.
 	 * Alias for this.store(name).set(value)
@@ -199,49 +179,98 @@ There is a set method in the Chart Context class that sets the value for the sto
 	}
 ```
 
-### Example usage:
+### Example usage
+To set a new CHART_VIEW value
+```javascript
+	context.value(ChartOption.CHART_VIEW)
+```
+
 When a new value is set for the CHART_VIEW property, the callback is triggered because of the subscription
 ```javascript
-  context.subscribe('CHART_VIEW', () => {
+  context.subscribe(ChartOption.CHART_VIEW, () => {
     console.log('action to take when CHART_VIEW values changes')
   })
 ```
 
-## Chart Context
-The Chart Context class centralizes the management of chart properties using stores. By initializing stores within the context, it ensures that all state changes are managed consistently and efficiently.
+> TIP: Benefits of defining types
+- Consistency: Using static properties for event types ensures a single, consistent definition across your codebase, avoiding errors like typos and making the code more reliable.
+- Ease of Refactoring: Centralizing event types in a class simplifies refactoring; changing the event type in one place updates it everywhere, reducing the risk of errors.
+- Extensibility: Organizing event types in a class allows for easy extension and management as your application grows, ensuring your code remains clean and scalable.
 
-### Purpose:
-- Manage Charts: Keep track of all the charts, allowing for easy addition, removal, and updates.
-- Coordinate Updates: Update configurations and data for all charts from a single place. For example, it sets up and propagate global configurations for all charts, such as default styles or themes.
-- Uniform Behavior: Ensure that all charts adhere to certain standards or behaviors.
-
-
-```javascript (ChartContext.js)
-this.#stores = this.#allProperties.reduce((acc, curr) => {
-    acc[curr] = {
-        store: new ChartContextStore(this.#defaultValues[curr]),
-        ownValue: initialValues.hasOwnProperty(curr) || this.#alwaysOwnProperties.has(curr) || initlAll,
-    };
-
-    // Freeze always own stores.
-    if (this.#alwaysOwnProperties.has(curr)) {
-        Object.freeze(acc[curr]);
-    }
-
-    return acc;
-}, {});
+```javascript (/src/packages/data/types/ChartOption.js)
+	export default class ChartOption {
+		static DATA_FIELD = 'DATA_FIELD';
+		static CHART_VIEW = 'CHART_VIEW';
+	}
 ```
 
-Each property gets its own store, initialized with a default value.
-`ownValue` determines if the store's value is local to the context or inherited from a parent context.
-As mentioned in the section about subscriptions above, subscriptions ensure that changes in store values are propagated correctly.
+## Event Dispatcher
+The event dispatcher model is useful in scenarios where different parts of an application need to react to changes or actions occurring elsewhere in the application. 
 
-## Event listeners
+#### Purpose
+- Decoupling: The components don't need to know about each other directly. The button doesn't need to know that the logging system exists, only that it should dispatch an event when clicked.
+- Flexibility: Multiple listeners can be attached to the same event, allowing for easy extension and modification of behavior without altering existing code.
+- Maintainability: Code is easier to maintain because the event handling logic is centralized and follows a consistent pattern.
 
-## Building the dashboard with Svelte
-A new chart context is initialized with the global context settings. This is then passed down to the child components where are a toolbar representing a panel of buttons which causes changes to the charts, and the page section consisting of the charts.
+```javascript (EventDispatcher.js)
+	dispatchEvent(event, force) {
+		if (this.destroyed) {
+			console.warn('🗣️ Trying to dispatch events from destroyed dispatcher.', event.type);
+		}
 
-### Starting point
+		// Set the target and oldValue only if target is not set, otherwise it means that event was originally dispatched from another dispatcher and then forwarded.
+		if (!event.target) {
+			event.target = this;
+			event.oldData = this.#oldEvents[event.type]?.data;
+			this.#oldEvents[event.type] = event;
+		} else {
+			event._bubbled = true;
+		}
+
+		// Run callbacks for specific subscribers.
+		this.#listeners?.[event.type]?.forEach(callback => callback(event));
+
+		// Run callbacks for general subscribers.
+		this.#listeners?.['*']?.forEach(callback => callback(event));
+	}
+
+	addEventListener(type, callback) {
+		const callbacks = this.#listeners[type] || [];
+
+		if (callbacks.indexOf(callback) === -1) {
+			callbacks.push(callback);
+			this.#listeners[type] = callbacks;
+		}
+
+		// Return function to unsubscribe.
+		return function () {
+			this.target.removeEventListener(this.type, this.callback);
+		}.bind({ type, callback, target: this });
+	}
+```
+
+### Example usage
+To register a callback function that will be called whenever a specific event type, in this example AppStoreEventType.CHANGE, is dispatched
+```javascript
+	this.addEventListener(AppStoreEventType.CHANGE, ({ data, oldData, target }) => callback(data, oldData, target));
+```
+
+The dispatchEvent method is responsible for triggering events and executing the registered callbacks.
+```javascript
+	this.dispatchEvent(new AppEvent(AppStoreEventType.CHANGE, value))
+```
+
+> #### How is it different from the subscription model? 
+Key Differences:
+- Event Dispatcher: Focuses on discrete events and actions. Each event is independent, and the system is more about reacting to occurrences.
+- Subscription Model: Focuses on ongoing data or state changes, typically tied to a specific source of truth.
+
+<br/>
+
+<Header title="Building the dashboard: Starting point" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/svelte-components/dashboard/pages/Dashboard.svelte" />
+
+A new chart context is initialized with the global context settings. This is then passed down to the child components where are a toolbar representing a panel of buttons which causes changes to the charts, and a section consisting of the charts.
+
 ```svelte
 <script>
 	import DashboardCharts from '../DashboardCharts.svelte';
@@ -261,103 +290,167 @@ A new chart context is initialized with the global context settings. This is the
 <DashboardCharts context={pageRootContext} />
 ```
 
-A new chart context is initialized with the parent context. This is meant to localize the context to the component. The local context is destroyed when the component is destroyed and thus break all connections with the component that we no longer need.
+*Some of the code snippets below have been truncated for brevity. You can view the full code for each class by clicking on the arrow beside each header title.*
 
-A new ChartModule instance is initialized, which displays a chart based on the chart context. 
+<Header title="DashboardCharts component" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/svelte-components/dashboard/DashboardCharts.svelte" />
 
-#### DashboardCharts component
-```svelte (DashboardCharts.svelte)
-<script>
-	import { onMount, onDestroy } from 'svelte';
-	import ChartContext from '@/packages/data/ChartContext';
-	import ChartModule from '@/packages/charts/modular/general/chart-module/ChartModule';
+<CodeContainer2></CodeContainer2>
 
-	export let context;
+<Header title="ChartModule class" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/chart-module/ChartModule.js" />
 
-	let targetEl;
+Displays a chart body based on the chart context. `SingleViewChart` means there is only one layer of a chart type, such as a line, representing only one data property. Another class such as `MultipleViewsChart` can be created to display a multiple line chart or a layer of one line over a scatter plot. This dashboard will only be rendering a network visualization for now, so only the `SingleViewChart` class is utilized.
 
-	let plotInstance = null;
+<CodeContainer3></CodeContainer3>
 
-	const localContext = new ChartContext(context);
+<Header title="SingleViewChart class" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/single-view-chart/SingleViewChart.js" />
 
-	onMount(() => {
-		plotInstance = new ChartModule();
-		targetEl.appendChild(plotInstance.root.node());
-		plotInstance.width = targetEl.clientWidth;
-		plotInstance.height = targetEl.clientHeight;
-		plotInstance.context.parent = localContext;
+This creates a view to display data for only one property.
+
+<CodeContainer4></CodeContainer4>
+
+<br/>
+
+> TIP: Create a store to list all chart view types, so it can be extended in the future easily, if there has to be more chart types.
+For example, `new chartViews['GRAPH']()` will initialize `GraphView` class.
+
+```javascript (/src/packages/stores/chartViews.js)
+	import ChartViewType from '@/packages/charts/types/ChartViewType';
+	import GraphView from '@/packages/charts/views/graph/GraphView';
+
+	export default Object.freeze({
+		[ChartViewType.GRAPH]: GraphView,
+		[ChartViewType.LINE]: LineView,
 	});
-
-	onDestroy(() => {
-		plotInstance?.destroy();
-		localContext?.destroy();
-	});
-</script>
-
-<div class="chart">
-	<div class="plot-container" bind:this={targetEl} />
-</div>
 ```
 
-The ChartModule is responsible for rendering the body of the chart, based on assigned dimensions and coordinates. It then initalizes another class called  `SingleViewChart`
+#### [`ChartDataLoader` class](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/chart-data-loader/ChartDataLoader.js) loads chart data automatically based on options specified and renders a loader while waiting for data to finish loading.
 
-#### ChartModule class
-```svelte (ChartModule.js)
-export default class ChartModule extends InteractiveChartBase {
-	#chartBody = null;
-	#dataAutoLoad = true;
+<Accordion>
+	<CodeContainer9></CodeContainer9>
+</Accordion>
 
-	constructor() {
-		super();
+<Header title="Graph View" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/views/graph/GraphView.js" />
 
-		this.context.subscribe(ChartOption.CHART_VIEW, () => {
-			this.#createChartBody();
-		})
+Now that we have walked through the main structure of the dashboard, let's look at the internals of a chart type, such as the Graph View, which follows a different lineage of classes. You will see how a view is made up of layers after layers of classes, each serving a specific purpose, with the core being the `AppComponent` class. 
 
-	#createChartBody() {
-		// Proceed if the context is a data context.
-		if (this.context instanceof ChartContext) {
-			// Remove the chart body if it is not a single view chart.
-			if (!(this.#chartBody instanceof SingleViewChart)) {
-				this.#removeChartBody();
-				this.#chartBody = new SingleViewChart();
-				this.addChild(this.#chartBody);
-			}
+`GraphView` contains all the code necessary to render a network visualization. It is a child class of `ChartViewDescriptive`, which in turn is a child of `ChartView` class.  
 
-			// Set listeners.
-			this.#chartBody.addEventListener(AppEventType.DATA_UPDATED, e => this.dispatchEvent(e));
+```javascript (/src/packages/charts/views/graph/GraphView.js)
+	export default class GraphView extends ChartViewDescriptive {
+		// all the code to render and dynamically update a network visualization goes below
+		constructor() {
+			super();
 
-			this.#chartBody.context.parent = this.context;
+			this.mergeConfig(defaultConfig);
+
+			const g = this.chart.childrenContainer.append("g");
+
+			this.addEventListener(AppEventType.REDRAW_CHART, () => {
+				this.redraw();
+			});
 		}
 
-		// Otherwise, remove the chart body.
-		else {
-			this.#removeChartBody();
-		}
-
-		this.#updateChartBody();
-	}
-
-	#removeChartBody() {
-		if (this.#chartBody instanceof Sprite) {
-			this.removeChild(this.#chartBody);
-			this.#chartBody.destroy();
-			this.#chartBody = null;
+		redraw() {
 		}
 	}
+```
 
-	#updateChartBody() {
-		if (this.#chartBody) {
-			this.#chartBody.x = this.config.padding.left ?? 0;
-			this.#chartBody.y = this.config.padding.top ?? 0;
-			this.#chartBody.width = this.width - (this.config.padding.left ?? 0) - (this.config.padding.right ?? 0);
-			this.#chartBody.height = this.height - (this.config.padding.top ?? 0) - (this.config.padding.bottom ?? 0);
+<br/>
+
+#### [`ChartViewDescriptive`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/chart-view-descriptive/ChartViewDescriptive.js) is used to create the chart container, and also render and position additional or miscelleneous chart-related elements such as a legend.
+
+```javascript (/src/packages/charts/modular/general/ChartViewDescriptive.js)
+	export default class ChartViewDescriptive extends ChartView {
+		constructor() {
+			super();
+
+			this.mergeConfig(defaultConfig);
+
+			// Chart container.
+			this.#chart = this.addChild(new Sprite());
 		}
-  }
 
-	destroy() {
-		super.destroy();
-		this.#removeChartBody();
+		get chart() {
+			return this.#chart;
+		}
 	}
+```
+
+<span>How the DOM looks like</span>
+<figure>
+  <img width="50%" height="auto" src={graphview} />
+</figure>
+
+<br/>
+
+#### [`ChartView`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/ChartView.js) represents the visual part of chart. It is where properties such as the color, x and y scale of a chart is initialized, with setter and getter functions for each property. It also where request to redraw everything within a chart container is dispatched.
+
+<Accordion>
+	<CodeContainer8></CodeContainer8>
+</Accordion>
+
+<br/>
+
+#### [`ChartSprite`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/modular/general/ChartSprite.js) is the sprite to be used specifically for charts. An svg group is created to contain interfaces elements over the chart, such as a loading spinner.
+
+```javascript (/src/packages/charts/modular/general/ChartSprite.js)
+export default class ChartSprite extends Sprite {
+    #ui
+    #context
+
+    constructor () {
+        super()
+
+        this.#ui = this.root.append('g').attr('class', 'ui');
+        this.#context = new ChartContext();
+
+    }
+
+    get ui () {
+        return this.#ui
+    }
+
+    get context () {
+        return this.#context
+    }
+
+    destroy () {
+        super.destroy()
+        this.#context.destroy()
+    }
 }
 ```
+
+<br/>
+
+#### [`Sprite`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/charts/graphics/Sprite.js) is a basic class used to create graphics instance. It is essentially a chart's root.
+
+<Accordion>
+	<CodeContainer6></CodeContainer6>
+</Accordion>
+
+<br/>
+
+#### One of the main responsbilities of the [`ConfigurableAppComponent`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/core/ConfigurableAppComponent.js) is to make all sprites' children be aware of configuration changes through disaptching an event when any change to the configuration happens. It also contains other helper functions to handle the configuration.
+
+<Accordion>
+	<CodeContainer5></CodeContainer5>
+</Accordion>
+
+<br/>
+
+#### [`AppComponent`](https://github.com/dianaow/oop-knowledge-graph/blob/main/src/packages/core/AppComponent.js) is the core. It is the base for all classes in the app, where the id and name of the instance is set.
+
+<Accordion>
+	<CodeContainer7></CodeContainer7>
+</Accordion>
+
+
+## Conclusion
+In this article, we've explored the design and implementation of a data dashboard using Object-Oriented Programming (OOP) principles. By structuring our dashboard around key classes such as SingleViewChart and ChartContext, we've been able to create a system that is both modular and maintainable. The OOP design pattern addressing the challenge of managing communication between components.
+
+I first created the same network visualization dashboard in functional programming approach and quickly realized it was difficult to manage and maintain it because of the complexity in state management and handling side effects. As the dashboard grew, the tightly coupled code made it hard to isolate and modify specific parts without affecting others.
+
+Though there seems to be more overhead in setting up the OOP architecture, this OOP-based design lays the groundwork for future enhancements, such as adding new visualization types or more interactivity to the user interface. I feel that the flexibility of the current architecture means that these changes can be implemented with minimal disruption to the existing codebase.
+
+In conclusion, adopting OOP principles for building a data dashboard has proven to be a robust approach, offering both immediate benefits and long-term viability. As you embark on your own projects, consider how OOP can help you manage complexity and build flexible and extensible user interfaces.
