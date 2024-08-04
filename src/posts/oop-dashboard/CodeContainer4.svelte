@@ -114,8 +114,9 @@ export default class SingleViewChart extends ChartDataLoader {
 </div>
 
 <style>
-  .container-code {
+	.container-code {
 		display: flex;
-    width: 100%;
-  }
+		width: 100%;
+		margin: 0rem 0rem 3.5rem 0rem;
+	}
 </style>

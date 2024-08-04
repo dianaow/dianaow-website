@@ -79,14 +79,14 @@ export default class AppStore extends EventDispatcher {
 </script>
 
 <div class="container-code">
-  <CodeBlock {code} {highlightedLines} {steps}/>
+  <CodeBlock {code} {highlightedLines} {steps} blockName='src/packages/stores/AppStore.js' />
   <Steps {steps} on:highlight={handleHighlight} />
 </div>
 
 <style>
-  .container-code {
-    display: flex;
-    width: 100%;
+	.container-code {
+		display: flex;
+		width: 100%;
 		margin: 0rem 0rem 3.5rem 0rem;
-  }
+	}
 </style>

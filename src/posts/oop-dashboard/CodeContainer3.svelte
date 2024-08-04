@@ -63,7 +63,7 @@ export default class ChartModule extends ChartSprite {
 
   const steps = [
     { text: "When CHART_VIEW is assigned an initial value, a function to create a chart body is called", lines: [7,8,9], color: '#FFD700' },
-    { text: "Another class called `SingleViewChart is initialized, and returns an svg element representing the created chart body.`", lines: [17], color: '#00FFFF'},
+    { text: "Another class called SingleViewChart is initialized, and returns an svg element representing the created chart body.`", lines: [17], color: '#00FFFF'},
     { text: "Adds the newly created SingleViewChart instance as a child to the current object. addChild is a function in the parent Sprite class that will add the chart body to the DOM, nested within the div called 'plot-container'.", lines: [20], color: '#FF00FF'},
   ];
 
@@ -78,8 +78,9 @@ export default class ChartModule extends ChartSprite {
 </div>
 
 <style>
-  .container-code {
+	.container-code {
 		display: flex;
-    width: 100%;
-  }
+		width: 100%;
+		margin: 0rem 0rem 3.5rem 0rem;
+	}
 </style>

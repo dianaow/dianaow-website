@@ -1,6 +1,6 @@
 ---
 title: Building an OOP-oriented data dashboard
-description: Thoughts about why it's needed and how it can be created
+description: Thoughts about why the OOP paradigm is effective for creating an interactive interface and how it can be created in that manner
 date: '2024-8-3'
 categories:
 	- Javascript
@@ -21,6 +21,7 @@ published: true
 	import Header from './Header.svelte';
 	import flowchart from './images/flowchart.jpg'
 	import graphview from './images/svg_graphview.png';
+	import tree from './images/tree.png';
 </script>
 
 <br/><br/>
@@ -96,24 +97,54 @@ The `ChartContext` class centralizes the management of chart properties using st
 - Uniform Behavior: Ensure that all charts adhere to certain standards or behaviors.
 
 ```javascript (/src/packages/data/ChartContext.js)
-this.#stores = this.#allProperties.reduce((acc, curr) => {
-    acc[curr] = {
-        store: new ChartContextStore(this.#defaultValues[curr]),
-        ownValue: initialValues.hasOwnProperty(curr),
-    };
 
-    // Freeze always own stores.
-    if (this.#alwaysOwnProperties.has(curr)) {
-        Object.freeze(acc[curr]);
-    }
+export default class ChartContext extends EventDispatcher {
 
-    return acc;
-}, {});
+	constructor(parent = null, initialValues = {}, initlAll = false) {
+		super();
+
+	// Assign default values.
+	this.#defaultValues = Object.assign(
+		{
+			[ChartOption.DATA_FIELD]: DataType.GRAPH,
+			[ChartOption.CHART_VIEW]: DataType.GRAPH,
+			[ChartOption.CHART_BACKGROUND]: 'transparent',
+			[ChartOption.CHART_HEIGHT]: 1000,
+		},
+		initialValues
+	);
+
+	// List of all properties available.
+	this.#allProperties = Object.freeze([
+		ChartOption.DATA_FIELD,
+		ChartOption.CHART_VIEW,
+		ChartOption.CHART_BACKGROUND,
+		ChartOption.CHART_HEIGHT,
+	])
+
+	 ///...initialization of other variables
+
+	this.#stores = this.#allProperties.reduce((acc, curr) => {
+			acc[curr] = {
+					store: new ChartContextStore(this.#defaultValues[curr]),
+					ownValue: initialValues.hasOwnProperty(curr),
+			};
+
+			// Freeze always own stores.
+			if (this.#alwaysOwnProperties.has(curr)) {
+					Object.freeze(acc[curr]);
+			}
+
+			return acc;
+	}, {});
+
+	//...rest of code...
+}
 ```
 
 Each property gets its own store, initialized with a default value.
 `ownValue` determines if the store's value is local to the context or inherited from a parent context.
-In the next setion, we will see how subscriptions ensure that changes in store values are propagated correctly.
+In the next section, we will see how subscriptions ensure that changes to store values are propagated correctly.
 
 ## Subscription model
 The subscription model is used to manage state changes and communication between different parts of an application. The subscription model involves objects (subscribers) registering interest in specific events or changes to another object (publisher). When the publisher changes, it notifies all subscribed objects, allowing them to react accordingly.
@@ -212,7 +243,7 @@ The event dispatcher model is useful in scenarios where different parts of an ap
 - Flexibility: Multiple listeners can be attached to the same event, allowing for easy extension and modification of behavior without altering existing code.
 - Maintainability: Code is easier to maintain because the event handling logic is centralized and follows a consistent pattern.
 
-```javascript (EventDispatcher.js)
+```javascript (/src/packages/events/EventDispatcher.js)
 	dispatchEvent(event, force) {
 		if (this.destroyed) {
 			console.warn('🗣️ Trying to dispatch events from destroyed dispatcher.', event.type);
@@ -290,7 +321,7 @@ A new chart context is initialized with the global context settings. This is the
 <DashboardCharts context={pageRootContext} />
 ```
 
-*Some of the code snippets below have been truncated for brevity. You can view the full code for each class by clicking on the arrow beside each header title.*
+*Some of the code snippets below have been truncated for brevity. You can view the full code for each class by clicking on the arrow beside each header title. Hover over a bullet point to locate the relevant lines of code within the code block.*
 
 <Header title="DashboardCharts component" url="https://github.com/dianaow/oop-knowledge-graph/blob/main/src/svelte-components/dashboard/DashboardCharts.svelte" />
 
@@ -375,11 +406,20 @@ Now that we have walked through the main structure of the dashboard, let's look 
 		}
 	}
 ```
-
-<span>How the DOM looks like</span>
-<figure>
-  <img width="50%" height="auto" src={graphview} />
-</figure>
+<div style="display:flex;">
+	<div>
+		<span>How the DOM looks like</span>
+		<figure>
+			<img width="100%" height="auto" src={graphview} />
+		</figure>
+	</div>
+	<div>
+		<span>How the UI looks like</span>
+		<figure>
+			<img width="100%" height="auto" src={tree} />
+		</figure>
+	</div>
+</div>
 
 <br/>
 
