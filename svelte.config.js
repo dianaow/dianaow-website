@@ -25,7 +25,7 @@ import { getHighlighter } from 'shiki'
 const highlightCode = async (code, lang, meta) => {
 	const shikiHighlighter = await getHighlighter({
 		themes: ['rose-pine-moon'],
-		langs: ['javascript', 'typescript', 'svelte', 'python']
+		langs: ['javascript', 'typescript', 'svelte', 'python', 'jsx']
 	})
 	await shikiHighlighter.loadLanguage('javascript', 'typescript', 'python')
 	let html;

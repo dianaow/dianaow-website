@@ -9,7 +9,11 @@
 	<title>{data.meta.title}</title>
 	<meta property="og:type" content="article" />
 	<meta property="og:title" content={data.meta.title} />
-	
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@notforcasual">
+	<meta name="twitter:title" content={data.meta.title} >
+	<meta name="twitter:description" content={data.meta.description}>
+	<meta name="twitter:image" content={data.meta.thumbnail}>
 </svelte:head>
 
 <article class="container px-8 md:px-12 py-4 md:py-8 min-h-screen">
