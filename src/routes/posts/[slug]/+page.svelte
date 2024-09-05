@@ -16,7 +16,7 @@
 	<meta name="twitter:image" content={data.meta.thumbnail}>
 </svelte:head>
 
-<article class="container px-8 md:px-12 py-4 md:py-8 min-h-screen">
+<article>
   <!-- Title -->
 	<hgroup>
 		<h1>{data.meta.title}</h1>

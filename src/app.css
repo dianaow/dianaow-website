@@ -18,23 +18,23 @@
   }
   h1 {
     @apply text-3xl text-indigo-400 mt-2;
-    @apply md:text-4xl mt-4;
-    @apply xl:text-6xl mt-8;
+    @apply md:text-4xl mb-4 mt-2;
+    @apply xl:text-5xl mb-8 mt-16;
   }
   h2 {
     @apply text-xl text-indigo-400 mt-8;
-    @apply md:text-3xl mt-14;
-    @apply xl:text-4xl mt-20;
+    @apply md:text-3xl mb-6 mt-9;
+    @apply xl:text-4xl mb-9 mt-14;
   }
   h3 {
     @apply text-lg text-slate-200 mt-0;
-    @apply md:text-xl mt-12;
-    @apply xl:text-2xl mt-16;
+    @apply md:text-xl mb-6 mt-12;
+    @apply xl:text-2xl mb-8 mt-16;
   }
   h4 {
     @apply text-base text-indigo-300 mt-0;
-    @apply md:text-lg mt-8;
-    @apply xl:text-xl mt-6;
+    @apply md:text-lg my-8;
+    @apply xl:text-xl my-6;
   }
   span {
     @apply text-xs text-white;

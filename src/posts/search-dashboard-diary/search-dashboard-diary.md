@@ -1,5 +1,5 @@
 ---
-title: Weekly Diary 1 - Designing and developing a search engine and results interface
+title: Weekly Diary 1 - Next.js app with search engine and results interface
 description: A weekly diary to document the design and development process of a web application
 date: '2024-8-18'
 categories:
@@ -11,16 +11,17 @@ thumbnail_url: "https://raw.githubusercontent.com/dianaow/er-network/main/userfl
 
 <script lang="ts">
   import search_page1 from './images/search_page1.png'
-  import search_page2 from './images/search_page2.png'
 </script>
 
 I have been building many MVPs and prototypes for clients from the ground up that I have decided to document/share my creation process of one such project in the form of a weekly diary. 
 
-## What I will be building
-A web-responsive search engine and results interface, with a network visualization dashboard.
-The web application only has two screens, the search and dashboard page, and is served with mock data all imported from csv files (as of now). 
+# What I will be building
+A web-responsive search engine and results interface, with a network visualization dashboard amongst various charts.
+The web application only has two screens, the search and dashboard page, and is served with mock data in the form of csv files (as of now). However, the intention is to create API routes
 
-## Work Done
+The client will be using this prototype for demonstration and presentation purposes to potential investors and stakeholders.
+
+# Work Done
 The design of the search page was done directly with code. I took inspiration from Vercel and Github's clean and light-themed site design.
 
 I developed reusable form field components, such as text input, dropdowns, buttons and checkboxes. This was made much easier with the help of ChatGPT-4o. As an example here is the prompt I used to create the text input component.
@@ -69,7 +70,7 @@ const TextInput = ({
 
 export default TextInput;
 ```
-#### Usage example
+### Usage example
 ```jsx (src/app/search/page.jsx)
   <div className="w-3/4">
     <TextInput
@@ -365,7 +366,7 @@ I think I should have included this sort option in my earlier prompt.
   };
 ```
 
-#### Usage example
+### Usage example
 ```jsx 
   const headers = ['Name', 'Priority', 'Score'];
   const data = [
@@ -401,15 +402,18 @@ The client provided feedback that there isn't a need to display all search resul
   <img src={search_page1} alt="Search page 1"/>
 </figure>
 
-<figure>
-  <img src={search_page2} alt="Search page 2"/>
-</figure>
 
-## Challenges faced
-The client had no finalized form content and was undecided on what particulary form fields should be available to the app's user, so I had to modify the search page repeatedly. Creating reusable form components helped make adjustments convenient, but layout changes were more time-consuming as I had to modify the Tailwind classes of the parent divs wrapped around the form components multiple times.
+## Network Visualization Dashboard
+
+I have my own D3.js network generating function reused and honed across many client projects. It was quick and easy to configure and create a network based on the data with simple interactivity such as hover tooltip. Next week, I will focus on adding a timeline and node click events to dyanamically update the graph, something that I have done 
+
+On this `Dashboard` component, I also created other tables to show information related to the entity.
+
+# Challenges faced
+Creating reusable form components helped make repeated adjustments to the form convenient. Layout changes were more time-consuming as I had to modify the Tailwind classes of the parent divs wrapped around the form components multiple times.
 
 The intricacies to create an aesthetic, professional-looking and intuitive form and table display, meant that I spent quite some time tweaking the design. Each table also has rich and different content to display.
 
-## Lessons learned
+# Lessons learned
 I believe that I should be able to reuse each form components wholly for future projects, which is nice as it will definitely speed up the development process of prototypes. This is particularly helpful as it is always the case with clients in the MVP stage to be on a very tight budget and deadline, whilst demanding high design expectations (as they will be using the prototype I am building to pitch to potential investors and stakeholders), which comes along with it many rounds of design iterations with them. Being able to quickly have a baseline page setup to then dive into the details is definitely useful.
 

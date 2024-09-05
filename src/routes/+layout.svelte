@@ -5,7 +5,7 @@
 	import '../app.css'
 </script>
 
-<div class="layout">
+<div class='max-w-7xl mx-auto min-h-screen'>
 	<Header />
 
 	<main>
