@@ -14,6 +14,7 @@ thumbnail_url: ""
   import NETWORK_TIMELINE_HOVER from './videos/NETWORK_TIMELINE_HOVER.mp4'
   import NETWORK_EXPAND_RESET from './videos/NETWORK_EXPAND_RESET.mp4'
   import NETWORK_TIMELINE_ERROR from './videos/NETWORK_TIMELINE_ERROR.mp4'
+  import search_page from './images/search_page.png'
 </script>
 
 I have been building many MVPs and prototypes for clients from the ground up that I have decided to document/share my creation process of one such project in the form of a weekly diary. This is my work dairy for the challenging Week 2 of the project, which eventually stretched on to a third week.
@@ -24,23 +25,29 @@ I have been building many MVPs and prototypes for clients from the ground up tha
 
 After the first week's review, the client provided feedback that there isn't a need to display all search result information at once, and suggested tabs at the left side to show each table one at a time.
 
-I also had to implement a *search filtering logic* across the mock datasets based on multiple text fields. Beside text search, datasets can also be excluded through the checkboxes from search. The search results are shown below the form as a tab component. The tabs and tab content on the left are dynamically set. Because I had already compartmentalized each returned dataset result into a Table component, it became less of a hassle to completely rewrite the code representing the search results section. 
+I also had to implement a *search filtering logic* across the mock datasets based on multiple text fields. Datasets can also be excluded from the search through the checkboxes. The search results are shown below the form as a Tab component. Tab labels and each tab content are dynamically set. Because I had already compartmentalized each returned result into a Table component, it became less of a hassle to completely rewrite the code representing the search results section. 
 
 Clicking on the tab at the top reveals more information specific to the searched entity only, represented as tables again. It also renders a button that when clicked, redirect the users to a network visualization dashboard specific to that entity. 
 
+<figure>
+  <img src={search_page} alt="Search page new"/>
+</figure>
+
 ## Creating API routes
 
-During the first week, I simply imported the data to the Next.js component client-side like this
+During the first week, I simply imported data to the Next.js component client-side like this.
 
 `import { entities, relationships } from '@/app/lib/network/data.js';`
 
 <br/>
 
-This week, I set up API routes in the application using Next.js App Router to dynamically extract data from specific local folders. Here are the steps I took:
+This week, I created API routes in the application using Next.js App Router to dynamically extract data from specific local folders. 
 
-1. I had to convert the existing data Javascript files to JSON format. 
-2. I had to create a folder named after the entity and transfer all JSON files belonging to that entity inside it.
-3. I created an API route in the `app/api/data` directory. Inside `route.js` file is a GET request, using the `fs` module to read files from a local folder containing the global datasets. This route is useful to fetch data from the search page to be filtered based on the form submission details.
+Here are the steps I took:
+1. I converted all existing Javascript data files to JSON format. 
+2. I created a folder named after each entity and transfer all JSON files belonging to that entity inside it.
+3. I created a folder to store JSON files which will only be used during the search. These files are termed global datasets.
+4. I created an API route in the `app/api/data` directory. Inside `route.js` file is a GET request, using the `fs` module to read files from a local folder containing the global datasets. This route is useful to fetch data from the search page to be filtered based on the form submission details.
 
 <br/>
 
@@ -79,14 +86,35 @@ I believe this pattern is valuable during the prototype phase, allowing for a fl
 
 It is time to integrate a timeline component to the network visualization. To do this, I will create a `NetworkTimeline` component and migrate all the code relevant to the network viz from the `Dashboard` component inside. The  `NetworkTimeline` component is a child of the `Dashboard` component.
 
-These are the interaction features I need to implement:
-- *Timeline*: Unlike a typical timeline of regular date intervals, only ticks representing an event date will be shown. When a new timestamp is selected, the entire network smoothly transitions into their new coordinates.
-- *Right-Click Context Menu*: Upon right-clicking the root node, a context menu appears with an 'Expand' option. Selecting 'Expand' will reveal the remaining layers of connections within the existing graph at the selected timestamp, regardless of edge direction.
-- *Merge of Transaction records*: There are two different datasets which are merged into a single network. One is the connection of other entities to the searched entity, and the second is a dataset of transactions that have to be processed to fit the same graph structure as the first dataset. This transactions sub-graph is styled differently.
-- *Node Click*: When a node with a certain attribute value is clicked, other components on the dashboard page respond by updating dynamically.
-- *Drag/Reset*: All nodes can be dragged around, but on release they are fixed at that position. Clicking the 'Reset' button will re-arrange all nodes and links into their original positions. Reset also undos the outcome of the expand action. 
+### Interaction features to implement:
+1. *Timeline* 
+  - Unlike a typical timeline of regular date intervals, only ticks representing an event date will be shown. 
+  - When a new timestamp is selected, the entire network smoothly transitions into their new coordinates.
 
 <br/>
+
+2. *Right-Click Context Menu*
+  - Upon right-clicking the root node, a context menu appears with an 'Expand' option. 
+  - Selecting 'Expand' will reveal the remaining layers of connections within the existing graph at the selected timestamp, regardless of edge direction.
+
+<br/>
+
+3. *Merge of Transaction records*
+  - There are two different datasets which are merged into a single network. One is the connection of other entities to the searched entity, and the second is a dataset of transactions that have to be processed to fit the same graph structure as the first dataset. 
+  - This transactions sub-graph is styled differently.
+
+<br/>
+
+4. *Node Click*
+  - When a node with a certain attribute is clicked, other components on the dashboard page respond by updating dynamically.
+
+<br/>
+
+5. *Drag/Reset* 
+  - All nodes can be dragged around, but on release they are fixed at that position. 
+  - Clicking the 'Reset' button will re-arrange all nodes and links into their original positions. Reset also undos the outcome of the expand action. 
+
+<br/><br/>
 
 The network generating function `ForceGraph` is decoupled from the timeline and provides a public `update` method. This method is called whenever there is a need to update the graph with changed data, such as when a new timestamp is selected from the timeline.
 
@@ -177,7 +205,7 @@ I also attached event listeners to all visible nodes. These listeners will trigg
   }
 ```
 
-Since the dataset is structured as a *timeseries*, rendering a snapshot of the network at a specific point in time requires filtering the original dataset of entities and relationships based on the timestamp stored in `currentDate`. It is then further filtered to display only connections that are up to a specified degree away from the root node. Finally, the transaction records are processed and merged. I encapsulate all this in a `dataProcessing` function as it will be repeatedly used on the `NetworkTimeline` component.
+Since the dataset is structured as a *timeseries*, rendering a snapshot of the network at a specific point in time requires filtering the original dataset of entities and relationships based on the timestamp stored in `currentDate`. It is then further filtered to display only connections that are up to a specified degree away from the root node. Finally, the transaction records are processed and merged. I encapsulate all this in a `dataProcessing` function as it will be repeatedly used in the `NetworkTimeline` component.
 
 ```javascript (NetworkTimeline.js)
   function dataProcessing(entities, relationships, transactions, currentDate, maxDegree) {
@@ -193,7 +221,7 @@ Since the dataset is structured as a *timeseries*, rendering a snapshot of the n
 
 In the `NetworkTimeline` component, the `ForceGraph` function is initialized once with this post-processed set of nodes and links, along with predefined configuration settings. Each element (node, edge, label) has their own default setting, but can be overwritten during initialization.
 
-Whenever the `currentDate` value changes or 'Expand' action is triggered, the original dataset is filtered again (through `dataProcessing`) and update method (`graph.current.update`) is triggered with a new set of nodes and links.
+Whenever `currentDate` changes or 'Expand' action is triggered, the original dataset is filtered again through `dataProcessing` and update method (`graph.current.update`) is triggered with a new set of nodes and links.
 
 ```javascript (NetworkTimeline.js)
   const graph = useRef(null);
@@ -267,12 +295,12 @@ Whenever the `currentDate` value changes or 'Expand' action is triggered, the or
   }, [currentDate, relationships, entities, width, height]);
 ```
 
-> Tip: Use Graphology's javascript library for convenient access to graph theory algorithms and common utilities such as graph attributes, traversals. For example, I used the `forEachNeigbour` method in the `filterNetworkByDegree` function.
+> Tip: Use Graphology's javascript library for convenient access to graph theory algorithms and common utilities such as graph attributes, traversals. For example, I used the `forEachNeigbour` method in the `getNeighborsAtNDegree` function.
 
 
 ## Transition effect: Coordinates calculation
 
-Each update results in an unsightly jump of nodes as they move to their new coordinates, due to the simulation restarting and running continuously with every change. I decided to then reference another project of mine, from years ago, where I managed to acheive a desirable smooth transition effect for entering nodes. On initialization, pre-calculate all coordinates by finishing the simulation before rendering, then store this set of coordinates as x0 and y0 attributes. These x0-y0 coordinates are then used to render a static graph initially. 
+Each update results in an unsightly jump of nodes as they move to their new coordinates, due to the simulation restarting and running continuously with every change. I decided to then reference another project of mine, from years ago, where I managed to acheive a desirable smooth transition effect. On initialization, pre-calculate all coordinates by finishing the simulation before render, then store this set of coordinates as x0 and y0 attributes. These x0-y0 coordinates are then used to render a static graph initially. 
 
 ```javascript (/charts/network/index.js)
   function updateLayout () {
@@ -302,7 +330,7 @@ When`currentDate` changes, the `useEffect` hook is triggered again, Inside `Forc
 
 <br/>
 
-Initially, the page loads a snapshot of the graph at the final timestamp in the list of events. Here’s the key: outside of the `useEffect` hook, filter the nodes based on the final timestamp and run the simulation on these nodes (`nodesLast`) to calculate their x-y coordinates. When useEffect runs, reference `nodesLast` to match and assign coordinates to the filtered nodes. If there are no matching nodes due to differences between the final timestamp and currentDate, it’s not an issue. The simulation will recalculate all node positions during reheating. However, since the nodes already have initial coordinates, the simulation will adjust them based on these starting points, influenced by the specified forces, ensuring that the adjusted coordinates remain close to their previous positions.
+Initially, the page loads a snapshot of the graph at the final timestamp in the list of events. Here’s the key: outside of the `useEffect` hook, filter the nodes based on this final timestamp and run the simulation on these nodes (`nodesLast`) to calculate their x-y coordinates. When `useEffect` runs, reference `nodesLast` to match and assign coordinates to the filtered nodes. If there are no matching nodes due to differences between the final timestamp and `currentDate`, it’s not an issue. The simulation will recalculate all node positions during reheating. However, since the nodes already have initial coordinates, the simulation will adjust them based on these starting points, influenced by the specified forces, ensuring that the adjusted coordinates remain close to their previous positions.
 
 ```javascript (NetworkTimeline.js)
   const graph = useRef(null); // Using useRef to persist the graph instance across renders
@@ -335,7 +363,7 @@ Initially, the page loads a snapshot of the graph at the final timestamp in the 
   }, [currentDate, relationships, entities, width, height]);
 ```
 
-Encapsulate the simulation definition within a function so it can be reused with the same configuration in both the NetworkTimeline and ForceGraph functions, ensuring synchronized graph layouts. Attributes such as distance can still be specified separately to customize link distances as needed.
+Encapsulate the simulation definition within a function so it can be reused with the same configuration in both the `NetworkTimeline` and `ForceGraph`, ensuring synchronized graph layouts. Attributes such as distance can still be specified separately to customize link distances as needed for a cleaner-looking graph layout.
 
 ```javascript (/charts/network/index.js)
 export function getSimulation(width, height) {
@@ -475,7 +503,7 @@ It was nice knowing that through the amalgamation of my past code and methods, I
 
 ## Node and edge style
 
-From the beginning, my goal has been to make the network generating function as reusable and flexible as possible. Therefore, it is designed to support various customizations, bells and whistles, with the ability to easily toggle options on or off as needed.
+From the beginning, my goal has been to make the network generating function as reusable and flexible as possible for any project. Therefore, it is designed to support various customizations, bells and whistles, with the ability to easily toggle options on or off as needed.
 
 ### Customizations:
 
@@ -527,13 +555,15 @@ Demonstration of 'Expand' and 'Reset' action
 
 For this section below the network, I built a scatterplot and bubble chart with D3.js. These two charts were created with reusability, interactivity and dynamic data updates in mind, hence followed a similar structure as the network generating function.
 
+Thesse charts were rendered inside React components, which then called from the `Dashboard` component.
+
 # Challenges faced
 
-Whilst a graph/network data structure seem all too familiar to me, it's not with the client, and he requested that I take the time over a video call to explain to him how not only to construct a dataset of entities and relationships from scratch, but also to create one with multiple levels of connections. There were repeated back-and-forth correspondences and video demos to confirm his understanding of the matter. 
+Whilst a graph/network data structure seem all too familiar to me, it's not with the client, and he asked me to take the time over a video call to explain to him how not only to construct a dataset of entities and relationships from scratch, but also to create one with multiple levels of connections. There were repeated back-and-forth correspondences and video demos to confirm his understanding of the matter. 
 
-The client mentioned having datasets for the prototype, but it turned out that the time series of relationships for the network and other charts' datasets didn't exist. Although creating mock data might seem quick, it still requires my time and effort. He provided only a list of events and an array of entities, but not the full time series dataset needed for the graph. I had to manually construct the dataset so that hovering over a specific timestamp would reveal the corresponding snapshot of the graph. Ulimately, there were also various adjustments needed to finalize the prototype for client approval. These were addressed throughout the third week. 
+The client mentioned having datasets for the prototype, but it turned out that the time series of relationships for the network and other charts' datasets didn't exist. Although creating mock data might seem quick, it still requires my time and effort. He provided only a list of events and an array of entities and relationships, but not the full time series dataset needed for the graph. I had to manually construct the dataset so that hovering over a specific timestamp would reveal the corresponding snapshot of the graph. Ulimately, there were also various adjustments needed to finalize the prototype for client approval. These were addressed throughout the third week. 
 
-Instead of receiving a detailed Scope of Work document and Figma design, the client's vision for the prototype was conveyed during a face-to-face meeting. I realized later that I missed some of his verbal instructions, with amounted to a sizeable list of new to-dos. This includes interactively updating the table content next to the scatter plot when a datapoint is hovered, dim entry effect, the 'expand' and 'reset' feature of the network viz.
+Instead of receiving a detailed Scope of Work document and Figma design, the client's vision for the prototype was conveyed during a face-to-face meeting. I realized later that I missed some of his verbal instructions, with amounted to a sizeable list of new to-dos. This includes interactively updating the table content next to the scatter plot when a datapoint is hovered, dim entry effect of ndoes, the 'Expand' and 'Reset' feature of the network viz.
 
 Fortunately, adding these features wasn't too difficult with my network and chart rendering functions. However, together, these overlooked features significantly impacted my initial cost evaluation.
 
@@ -544,4 +574,6 @@ Writing clean code that not only accomplishes the task but can be easily referen
 
 By mid of Week 2, I realized that I had underestimated the number of tasks in this project. I still struggle to break down project tasks with precise detail, which is crucial for fixed-rate projects. In fact, I think it is practically impossible to list out all tasks as bullet points expanded into multiple layers of sub-points, with time and cost estimates for each. When I feel underpaid, I usually try to renegotiate a higher fee, especially if both the client and I agree that the work is good quality and on the right track. Sometimes, this approach will not work.
 
-Rather than relying on the client's goodwill, it's essential to accurately scope the project from the start and build in sufficient buffer to ensure your fee exceeds your initial valuation. Always ask the client to provide a detailed Scope of Work (SOW) alongside the contract, particularly if they emphasize that the app needs to be built according to their specific vision. In my own contract, I noticed that it only contained brief bullet points for each section of the app. This is not a SOW. While this may seem like common sense, I want to emphasize the importance of this approach to both myself and others.
+Instead of depending on the client's trust, it's crucial to accurately scope the project from the outset and include a sufficient buffer to ensure your fee surpasses your initial estimate, to ensure that you're covered for any unexpected challenges or additional work that may arise, preventing potential shortfalls in your compensation. Always ask the client to provide a detailed Scope of Work (SOW) alongside the contract, particularly if they emphasize that the app needs to be built according to their specific vision within a fixed fee. Take the time to review and edit it further until you are comfortable with it. In my own contract, I noticed that it only contained brief bullet points of few sentences. This is not a SOW. While this may seem like common sense, I want to emphasize the importance of this approach to both myself and others.
+
+<br/>

@@ -7,7 +7,7 @@
 
 @layer components {
   p {
-    @apply text-sm text-slate-300 mt-5 mb-2 leading-loose;
+    @apply text-sm text-slate-300 mt-5 mb-2 leading-9;
     @apply md:text-lg;
     @apply lg:text-xl;
   }
@@ -23,8 +23,8 @@
   }
   h2 {
     @apply text-xl text-indigo-400 mt-8;
-    @apply md:text-3xl mb-6 mt-9;
-    @apply xl:text-4xl mb-9 mt-14;
+    @apply md:text-3xl mb-4 mt-8;
+    @apply xl:text-4xl mb-8 mt-16;
   }
   h3 {
     @apply text-lg text-slate-200 mt-0;
@@ -55,7 +55,11 @@ body {
   background-color: theme(colors.slate.950);
 }
 
-ul,
+ul {
+	padding-left: 30px;
+  list-style-type: circle;
+}
+
 ol {
 	padding-left: 10px;
   list-style-type: disc;
@@ -73,6 +77,10 @@ li {
   padding-left: 30px;
 }
 
+i {
+  color: #e0e7ff;
+}
+
 pre {
 	padding: 1rem;
 	border-radius: 8px;
@@ -82,7 +90,7 @@ pre {
 
 :not(pre) > code {
   background-color: theme(colors.slate.800);
-  color: white;
+  color: #e0e7ff;
   padding: 0.3em;
   border-radius: 8px;
 }
