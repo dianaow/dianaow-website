@@ -114,7 +114,7 @@ In the page, specify named actions that you require for cart manipulation. Each 
 When creating a cart, associate a customer's identification (customer_id and email) to it. These parameters can only be found in the update method, so after creating a cart, make another call to update the cart with the customer_id and email address of the logged-in user. This prevents multiple Stripe PaymentIntents from being created along the way as the customer progresses through each stage of the checkout to payment process. Payment intents will be explained later on. I found attaching customer's identification to a cart necessary to have payment status be 'captured' instead of 'awaiting'. If a guest user, no customer_id and email can be found, so this will be dealt with at the checkout page before a payment intent is made. 
 
 
-```svelte (routes/cart/+page.server.ts)
+```typescript (routes/cart/+page.server.ts)
   import type { PageServerLoad, Actions } from './$types'
   import medusa from '$lib/server/medusa'
 
@@ -199,7 +199,7 @@ Inside the product page, create a button. To invoke the named action inside `rou
 
 Inside the cart component `lib/components/Cart.svelte`, create a button. To invoke the action inside `routes/checkout/+page.server.ts` from the button, wrap it with a form action.
 
-```html (lib/components/Cart.svelte)
+```svelte (lib/components/Cart.svelte)
   <form action="/checkout" method="post">
     <button use:close type="submit">
       Checkout
@@ -218,7 +218,7 @@ The stripe plugin has to be installed correctly for any cart-related API calls t
 
 If you check the cart object, the data attribute nested inside the payement session attribute, will hold the payment intent among other data necessary to authorize the payment.
 
-```svelte (routes/checkout/+page.server.ts) 
+```typescript (routes/checkout/+page.server.ts) 
   import type { PageServerLoad, Actions } from './$types'
   import { fail, error, redirect } from '@sveltejs/kit'
   import medusa from '$lib/server/medusa'
@@ -307,7 +307,7 @@ In your payment page, initialize Stripe and add a `<Elements>` component to rend
 Initially pre-populate the address fields with one of the customer's saved addresses, if any, for checkout convenience. A Medusa API call will be not be made to add this address to the customer's profile, unless any of the fields is different from the current address. A separate Medusa API call will be made to update the cart with the populated address as the shipping address.
 Pay attention to the data structure of the contact and address information for both the Medusa API and Stripe API, they have to be provided accurately.
 
-```svelte
+```javascript
    if (user.shipping_addresses) {
       for (let address of user.shipping_addresses) {
          contacts.push({

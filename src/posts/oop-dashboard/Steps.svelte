@@ -22,7 +22,7 @@
   {/each}
   {#if image}
   <figure>
-    <img src={image} width="60%">
+    <img src={image} width="60%" alt="Step">
     <figcaption>How the DOM looks like</figcaption>
   </figure>
   {/if}

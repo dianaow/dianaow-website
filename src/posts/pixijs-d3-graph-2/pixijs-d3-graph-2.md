@@ -61,9 +61,9 @@ I believe Model 1 is more commonly encountered in online examples and aligns wit
 Model 2 was initially introduced to me by a client who requestd this feature for his graph application. It involves displaying connections between nodes from three different hierarchical levels within clusters and between clusters for a data modelling system. The challenge was intriguing, as I hadn't come across such an interactive graph before. In this article, I'll provide a detailed description of how I approached this task.
 
 <div style="display: flex">
-  <img style='padding: 10px' width="30%" height="auto" src={model2_example} class='mockup'>
-  <img style='padding: 10px' width="30%" height="auto" src={model2_example1} class='mockup'>
-  <img style='padding: 10px' width="30%" height="auto" src={model2_example2} class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={model2_example} alt="Model2" class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={model2_example1} alt="Model2" class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={model2_example2} alt="Model2" class='mockup'>
 </div>
 
 
@@ -107,7 +107,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
 <p><span class='text-bold'>Be mindful that depending on how the user chooses to interact with the graph, there may be an assortment of <span class='tier1'>SUBMODULE</span>, <span class='tier2'>SEGMENT</span> or <span class='tier3'>VARIABLE</span> nodes on screen, such as in the image shown.</span> There are rules governing how nodes respond to expand or collapse actions. To manage these rules for each node, I've created a JavaScript object named <code>nodeCollapsedState</code>. This object stores boolean values for all <span class='tier1'>SUBMODULES</span> and <span class='tier2'>SEGMENTS</span>, enabling us to determine whether a node should be expanded or collapsed. Initially, I've populated it to reflect the default state on page load. For instance, it suggests that all <span class='tier2'>SEGMENTS</span> are initially collapsed (with a value of 1), while all <span class='tier1'>SUBMODULES</span> are in an expanded state (with a value of 0)</p>
 
 <figure>
-  <img width="100%" height="auto" src={assortment_node_types_labelled} class='mockup'>
+  <img width="100%" height="auto" src={assortment_node_types_labelled} class='mockup' alt="assortment_node_types_labelled">
 </figure>
 
 ```javascript (graph.js)
@@ -132,12 +132,12 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
   <div style='width:50%; padding: 10px;'>
     <h3>Fully Collapsed</h3>
     <code>let expandedAll = false</code>
-    <img width="auto" height="500px" src={full_collapsed} class='mockup'>
+    <img width="auto" height="500px" src={full_collapsed} alt="Full Collapsed" class='mockup'>
   </div>
   <div style='width:50%; padding: 10px;'>
     <h3>Fully Expanded</h3>
     <code>let expandedAll = true</code>
-    <img width="auto" height="500px" src={full_expanded1} class='mockup'>
+    <img width="auto" height="500px" src={full_expanded1} alt="Full Expanded" class='mockup'>
   </div>
 </div>
 
@@ -149,7 +149,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
     <p><span class='tier2'>SEGMENTS</span> <span class='text-bold'>have a special behavior: a double-click action can trigger either an expand or a collapse action. </span> The expand action is triggered only if there is no previous double-click action for that <span class='tier2'>SEGMENT</span>. Therefore, on initial view when <code>expandedAll = false</code>, clicking on any <span class='tier2'>SEGMENT</span> will initiate an expand action.</p>
   </div>
   <figure>
-    <img width="40%" height="auto" src={flow_diagram_expand} class='mockup'>
+    <img width="40%" height="auto" src={flow_diagram_expand} alt="Flow Diagram Expand" class='mockup'>
   </figure>
 </div>
 
@@ -171,6 +171,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
         id="placeholder_image"
         src={expand1p}
         fetchpriority="high"
+        alt="Placeholder Image"
       />
     </div>
   </div>
@@ -180,6 +181,7 @@ The feature to expand and collapse subgraphs in a force-directed graph is incred
         id="placeholder_image"
         src={expand2p}
         fetchpriority="high"
+        alt="Placeholder Image"
       />  
     </div>              
   </div>
@@ -329,7 +331,7 @@ if (d.type === "tier2") {
     <p class="text-bold">For brevity, the code inside collapsibleAction mirrors expandableAction but functions in the reverse direction</p>
   </div>
   <figure>
-    <img width="40%" height="auto" src={flow_diagram_collapse} class='mockup'>         
+    <img width="40%" height="auto" src={flow_diagram_collapse} alt="Flow Diagram Collapse" class='mockup'>         
   </figure>
 </div>
 
@@ -340,6 +342,7 @@ if (d.type === "tier2") {
         id="placeholder_image"
         src={collapse1}
         fetchpriority="high"
+        alt="Placeholder Image"
       />
     </div>  
   </div>
@@ -349,6 +352,7 @@ if (d.type === "tier2") {
         id="placeholder_image"
         src={collapse2}
         fetchpriority="high"
+        alt="Placeholder Image"
       />
     </div>  
   </div>
@@ -451,9 +455,9 @@ When a user initiates the addition of new nodes by clicking on a submodule or se
 ```
 
 <div style="display: flex">
-  <img style='padding: 10px' width="30%" height="auto" src={expand1} class='mockup'>
-  <img style='padding: 10px' width="30%" height="auto" src={expand2} class='mockup'>
-  <img style='padding: 10px' width="30%" height="auto" src={expand3} class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={expand1} alt="Expand" class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={expand2} alt="Expand" class='mockup'>
+  <img style='padding: 10px' width="30%" height="auto" src={expand3} alt="Expand" class='mockup'>
 </div>
 
 ### Tweaking force-directed graph parameters
@@ -483,6 +487,7 @@ When a user initiates the addition of new nodes by clicking on a submodule or se
         id="placeholder_image"
         src={expand1p}
         fetchpriority="high"
+        alt="Placeholder Image"
       />
     </div>  
   </div>
@@ -494,6 +499,7 @@ When a user initiates the addition of new nodes by clicking on a submodule or se
         id="placeholder_image"
         src={expand1p}
         fetchpriority="high"
+        alt="Placeholder Image"
       />
     </div>  
   </div>

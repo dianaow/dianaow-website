@@ -82,7 +82,7 @@ By leveraging OOP principles, you can create a data dashboard that is not only r
 
 ## App Flowchart
 <figure>
-  <img width="100%" height="auto" src={flowchart} />
+  <img width="100%" height="auto" src={flowchart} alt="Flow Chart" />
 </figure>
 
 <br/>
@@ -410,13 +410,13 @@ Now that we have walked through the main structure of the dashboard, let's look 
 	<div>
 		<span>How the DOM looks like</span>
 		<figure>
-			<img width="100%" height="auto" src={graphview} />
+			<img width="100%" height="auto" src={graphview} alt="Graph View" />
 		</figure>
 	</div>
 	<div>
 		<span>How the UI looks like</span>
 		<figure>
-			<img width="100%" height="auto" src={tree} />
+			<img width="100%" height="auto" src={tree} alt="Tree" />
 		</figure>
 	</div>
 </div>

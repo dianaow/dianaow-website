@@ -23,9 +23,9 @@
 
   <h2 class='mt-8 md:mt-20'>Dashboards</h2>   
 
-  <div class='block md:flex p-4'>      
+  <div class='block md:flex px-4'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={biovitals_demo}>
+      <img src={biovitals_demo} alt="Portfolio">
       <a href="https://www.biofourmis.com/care-delivery" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Data viz library for a healthcare tech company</h2>
@@ -35,8 +35,8 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={fifa19_binned}>
-      <a href="https://www.biofourmis.com/care-delivery" target="_blank">
+      <img src={fifa19_binned} alt="Portfolio">
+      <a href="http://fifa19-viz.s3-website-ap-southeast-1.amazonaws.com/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>FIFA 19</h2>
           <p>React + D3.js</p>
@@ -45,9 +45,9 @@
       </a>
     </div>
   </div>
-  <div class='block md:flex p-4 lg:pb-16'>      
+  <div class='block md:flex px-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={svelte_dashboard}>
+      <img src={svelte_dashboard} alt="Portfolio">
       <a href="https://sveltekit-dashboard.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Interactive dashboard for Web3 gaming company</h2>
@@ -57,7 +57,7 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={health_timeline_mockup_simple}>
+      <img src={health_timeline_mockup_simple} alt="Portfolio">
       <a href="https://dianaow.com/posts/health_timeline/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Web-based tool for monitoring clinical data</h2>
@@ -70,9 +70,9 @@
 
   <h2>Network Visualizations</h2> 
 
-  <div class='block md:flex p-4 lg:pb-16'>      
+  <div class='block md:flex px-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={vizforsocialgood_network}>
+      <img src={vizforsocialgood_network} alt="Portfolio">
       <a href="https://vizforsocialgood-network.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>Network of Viz For Social Good contributers</h2>
@@ -82,8 +82,8 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={covid_network}>
-      <a href="https://dianaow.com/posts/covid19-network-singapore/" target="_blank">
+      <img src={covid_network} alt="Portfolio">
+      <a href="http://covid19-singapore.s3-website-ap-southeast-1.amazonaws.com/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2 class='m-0'>COVID-19 Network Singapore</h2>
           <p>React + D3</p>
@@ -95,19 +95,17 @@
   
   <h2>Geospatial</h2> 
 
-  <div class='block md:flex p-4 lg:pb-16'>      
+  <div class='block md:flex px-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={leaflet_dash_map} loading="lazy">
-      <a href="" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Interactive geospatial dashboard</h2>
-          <p>Leaflet + Dash</p>
-          <h4>Developed a geospatial app for Staged Systems, a US-based technology company, to visualise fibre broadband installation sites in the US, giving client a bird-eye's view of biz operations, while able to investigate specific locations.</h4>
-        </div>
-      </a>
+      <img src={leaflet_dash_map} loading="lazy" alt="Portfolio">
+      <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
+        <h2 class='m-0'>Interactive geospatial dashboard</h2>
+        <p>Leaflet + Dash</p>
+        <h4>Developed a geospatial app for Staged Systems, a US-based technology company, to visualise fibre broadband installation sites in the US, giving client a bird-eye's view of biz operations, while able to investigate specific locations.</h4>
+      </div>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={kiron_full} loading="lazy">
+      <img src={kiron_full} loading="lazy" alt="Portfolio">
         <a href="https://dianameow.com/vizforsocialgood/" target="_blank">
           <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
             <h2>Kiron</h2>
@@ -119,18 +117,27 @@
   </div>
 
   <div class='mt-8 mt-16'> 
-    <div class="border-2 border-white border-solid p-4 md:pb-16 md:px-16">
+    <div class="border-2 border-white border-solid px-4 md:pb-16 md:px-16 space-y-6">
       <h3>Testimonials from my clients</h3>      
-      <p>"Diana was excellent to work with! In addition to creating a great looking visualization of my data, she was able to build off and integrate with my current codebase. Will definitively use again in the future for interactive data application. She was also well organized on scope and deliverables and finished the final product very quickly once work began."</p>
-      <p>"Diana did an awesome job on taking our visualizations of Twitter activity to the next level. Not only she was able to quickly interpret and implement the features we were needing, but she also went ahead to proactively implement aesthetical improvements and code optimizations that made the visualization much more fluid and appealing. All of this was performed within budget and schedule and with a lot of attention to detail"</p>  
+      <p class='text-sm text-left
+      '>"Diana was excellent to work with! In addition to creating a great looking visualization of my data, she was able to build off and integrate with my current codebase. Will definitively use again in the future for interactive data application. She was also well organized on scope and deliverables and finished the final product very quickly once work began." - Staged Systems</p>
+      <hr class='opacity-30'>
+      <p class='text-sm text-left
+      '>"Diana did an awesome job on taking our visualizations of Twitter activity to the next level. Not only she was able to quickly interpret and implement the features we were needing, but she also went ahead to proactively implement aesthetical improvements and code optimizations that made the visualization much more fluid and appealing. All of this was performed within budget and schedule and with a lot of attention to detail"</p> 
+      <hr class='opacity-30'>
+      <p class='text-sm text-left
+      '>"Diana was really quick to grasp what we needed for this project, and was very flexible with adapting the output to fit what we needed. She was also engaged and took a lot of initiative for adding additional functionality to the website that we had not initially considered. Her visualization was very clearly reflective of what we initially asked for. She was also very quick to respond, and her turnaround time was really quick."</p> 
+      <hr class='opacity-30'>
+      <p class='text-sm text-left
+      '>"Diana is a great collaborator in website design. She creates elegant visualization that groups my stuff into a well-organized layout. Communication with her is enjoyable, that she carefully listens and quickly responds. I would recommend her to anyone who needs high-quality interactive websites" - Huang Junming</p>
     </div>
   </div>
     
   <h2>The unusual</h2> 
 
-  <div class='block md:flex p-4 lg:pb-16'>      
+  <div class='block md:flex px-4 lg:pb-16'>      
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={d3_force} loading="lazy">
+      <img src={d3_force} loading="lazy" alt="Portfolio">
       <a href="https://d3-force-collection.netlify.com" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>d3-force compilation</h2>
@@ -139,7 +146,7 @@
       </a>
     </div>
     <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={data_visualizers} loading="lazy">
+      <img src={data_visualizers} loading="lazy" alt="Portfolio">
       <a href="https://data-visualizers.netlify.app/" target="_blank">
         <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
           <h2>Data Visualization Society members in 2020</h2>

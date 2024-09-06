@@ -87,7 +87,7 @@ Create a Neo4j database, connect to it and ingest the graph data into it.
 <br/>
 
 <figure>
-  <img width="100%" height="auto" src={graph_overview} />
+  <img width="100%" height="auto" src={graph_overview} alt="Graph Overview" />
 </figure>
 
 ## Creating vector indexes in Neo4j
@@ -141,7 +141,7 @@ While all properties can technically be emdedded, only properties whose values a
 <br/>
 
 <figure>
-  <img width="100%" height="auto" src={graph_index} />
+  <img width="100%" height="auto" src={graph_index} alt="Graph Index" />
 </figure>
 
 ## Querying the vector indexes
@@ -160,7 +160,7 @@ This is a standard snippet of code found in most LangChain Chatbot tutorials. It
 <br/>
 
 <figure>
-  <img width="100%" height="auto" src={retrievalQA_results} />
+  <img width="100%" height="auto" src={retrievalQA_results} alt="RetrievalQA results" />
 </figure>
 
 ## Querying Neo4j database
@@ -194,7 +194,7 @@ While a really cool functionality, it is error prone, particularly so with less 
 **Output**
 
 <figure>
-  <img width="100%" height="auto" src={GraphCypherQAChain_results} />
+  <img width="100%" height="auto" src={GraphCypherQAChain_results} alt="GraphCypherQAChain_results" />
 </figure>
 
 It is only finding a product that does not contain the ingredient called retinol, but not products that are moisturizers. Running this same query again may not generate any result.
@@ -264,7 +264,7 @@ It is only finding a product that does not contain the ingredient called retinol
 **Output**
 
 <figure>
-  <img width="60%" height="auto" src={define_query} loading="lazy" />
+  <img width="60%" height="auto" src={define_query} loading="lazy" alt="Define Query" />
 </figure>
 
 In my opinion, I feel such method works best in certain contexts, such as a product recommendation system, where we know users are asking questions to find products. We most likely expect users to provide details describing the ideal products they have in mind through their needs. 
@@ -338,7 +338,7 @@ Now, we will query for similar products based on the LLM-generated object of ent
 **Output**
 
 <figure>
-  <img width="80%" height="auto" src={query_entities} loading="lazy"/>
+  <img width="80%" height="auto" src={query_entities} loading="lazy" alt="Query Entities" />
 </figure>
 
 Next, we will query for similar products based on a given description. Similarity is based on a product title, since that was the only property embedded on a Product node. Hence, it is more convenient to verify the search results. **Since we have two types of nodes, Product and Entity, with different set of properties embedded, we have to separate the queries.**
@@ -367,7 +367,7 @@ Next, we will query for similar products based on a given description. Similarit
 <br/>
 
 <figure>
-  <img width="80%" height="auto" src={query_product} loading="lazy" />
+  <img width="80%" height="auto" src={query_product} loading="lazy" alt="Query Product" />
 </figure>
 
 ## Building a Langchain agent
@@ -396,7 +396,7 @@ tool_names = [f"{tool.name}: {tool.description}" for tool in tools]
 **Output**
 
 <figure>
-  <img width="80%" height="auto" src={agent} loading="lazy" />
+  <img width="80%" height="auto" src={agent} loading="lazy" alt="Agent" />
 </figure>
 
 ### Non-LLM generated search response
@@ -438,5 +438,5 @@ Using an agent did not generate good responses. Let's keep it 'traditional' by r
 **Output**
 
 <figure>
-  <img width="80%" height="auto" src={search_pipeline} loading="lazy" />
+  <img width="80%" height="auto" src={search_pipeline} loading="lazy" alt="Search Pipeline" />
 </figure>

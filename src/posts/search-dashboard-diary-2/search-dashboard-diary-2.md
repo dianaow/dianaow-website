@@ -207,7 +207,7 @@ I also attached event listeners to all visible nodes. These listeners will trigg
 
 Since the dataset is structured as a *timeseries*, rendering a snapshot of the network at a specific point in time requires filtering the original dataset of entities and relationships based on the timestamp stored in `currentDate`. It is then further filtered to display only connections that are up to a specified degree away from the root node. Finally, the transaction records are processed and merged. I encapsulate all this in a `dataProcessing` function as it will be repeatedly used in the `NetworkTimeline` component.
 
-```javascript (NetworkTimeline.js)
+```jsx (NetworkTimeline.jsx)
   function dataProcessing(entities, relationships, transactions, currentDate, maxDegree) {
     const rootNode = entities.find(d => d.Root)
     const filteredLinks = filterTimeSeriesData(relationships, currentDate);
@@ -223,7 +223,7 @@ In the `NetworkTimeline` component, the `ForceGraph` function is initialized onc
 
 Whenever `currentDate` changes or 'Expand' action is triggered, the original dataset is filtered again through `dataProcessing` and update method (`graph.current.update`) is triggered with a new set of nodes and links.
 
-```javascript (NetworkTimeline.js)
+```jsx (NetworkTimeline.jsx)
   const graph = useRef(null);
   const [currentDate, setCurrentDate] = useState(lastDate);
 
@@ -332,7 +332,7 @@ When`currentDate` changes, the `useEffect` hook is triggered again, Inside `Forc
 
 Initially, the page loads a snapshot of the graph at the final timestamp in the list of events. Here’s the key: outside of the `useEffect` hook, filter the nodes based on this final timestamp and run the simulation on these nodes (`nodesLast`) to calculate their x-y coordinates. When `useEffect` runs, reference `nodesLast` to match and assign coordinates to the filtered nodes. If there are no matching nodes due to differences between the final timestamp and `currentDate`, it’s not an issue. The simulation will recalculate all node positions during reheating. However, since the nodes already have initial coordinates, the simulation will adjust them based on these starting points, influenced by the specified forces, ensuring that the adjusted coordinates remain close to their previous positions.
 
-```javascript (NetworkTimeline.js)
+```jsx (NetworkTimeline.jsx)
   const graph = useRef(null); // Using useRef to persist the graph instance across renders
   const [currentDate, setCurrentDate] = useState(lastDate);
 
@@ -365,7 +365,7 @@ Initially, the page loads a snapshot of the graph at the final timestamp in the 
 
 Encapsulate the simulation definition within a function so it can be reused with the same configuration in both the `NetworkTimeline` and `ForceGraph`, ensuring synchronized graph layouts. Attributes such as distance can still be specified separately to customize link distances as needed for a cleaner-looking graph layout.
 
-```javascript (/charts/network/index.js)
+```javascript (/charts/network/utils.js)
 export function getSimulation(width, height) {
   return d3.forceSimulation()
     .force(
@@ -399,40 +399,40 @@ export function getSimulation(width, height) {
 
 - *Exit selection* : This step handles the case where there are DOM elements that no longer have corresponding data points. D3.js removes these elements from the DOM.
 
-```javascript (NetworkTimeline.js)
-    nodeG.selectAll('.node')
-      .data(.nodes, (d) => d.id)
-      .join(
-        (enter) => {
-          hasNewNodes = enter.nodes().length === 0 ? false : true
+```javascript (/charts/network/index.js)
+  nodeG.selectAll('.node')
+    .data(.nodes, (d) => d.id)
+    .join(
+      (enter) => {
+        hasNewNodes = enter.nodes().length === 0 ? false : true
 
-          const newNode = enter
-            .append('g')
-            .attr('class', 'node')
-            .attr('pointer-events', 'auto')
-            .attr('cursor', 'pointer')
-            .attr('transform', (d) => `translate(${d.x0}, ${d.y0})`)
-            .call(drag(simulation))
-            .attr('opacity', 0)
-            .on('dblclick.zoom', null)
-            .call(enterNodeFunc)
+        const newNode = enter
+          .append('g')
+          .attr('class', 'node')
+          .attr('pointer-events', 'auto')
+          .attr('cursor', 'pointer')
+          .attr('transform', (d) => `translate(${d.x0}, ${d.y0})`)
+          .call(drag(simulation))
+          .attr('opacity', 0)
+          .on('dblclick.zoom', null)
+          .call(enterNodeFunc)
 
-          newNode
-            .append('circle')
-            .attr('r', (d) => d.radius)
-            .attr('fill', (d) => d.color)
-            .attr('stroke', (d) => nodeStyles.stroke || d.color)
-            .attr('fill-opacity', nodeStyles.fillOpacity)
-            .attr('stroke-opacity', nodeStyles.strokeOpacity)
-            .attr('stroke-width', nodeStyles.strokeWidth)
+        newNode
+          .append('circle')
+          .attr('r', (d) => d.radius)
+          .attr('fill', (d) => d.color)
+          .attr('stroke', (d) => nodeStyles.stroke || d.color)
+          .attr('fill-opacity', nodeStyles.fillOpacity)
+          .attr('stroke-opacity', nodeStyles.strokeOpacity)
+          .attr('stroke-width', nodeStyles.strokeWidth)
 
-          newNode.call(updateIconFunc)
-            
-          return newNode
-        },
-        (update) => update.call(updateNodeFunc),
-        exit => exit.call(exitFunc)
-      )
+        newNode.call(updateIconFunc)
+          
+        return newNode
+      },
+      (update) => update.call(updateNodeFunc),
+      exit => exit.call(exitFunc)
+    )
 ```
 
 ### What's happening in motion:
@@ -459,7 +459,7 @@ I also implemented a timeline control panel.
 
 > Gotcha: To prevent any mouse events from triggering while a transition is happening in D3.js, which may cause unwanted side effects, use a flag (`isTransitioning`) to indicate whether a transition is in progress. Check the flag at the beginning of the `mouseover` and `mouseleave` event handler to determine if the event should proceed.  The flag is set to true before a transition starts and reset to false using the .on('end', ...) method after the transition ends.
 
-```javascript (NetworkTimeline.js)
+```javascript (/charts/network/index.js)
   const t = svg.transition().delay(500).duration(800);
   const eT = svg.transition().duration(500)
 
@@ -520,7 +520,7 @@ From the beginning, my goal has been to make the network generating function as 
 
 <br/>
 
-```javascript
+```javascript (/charts/network/index.js)
 function updateIconFunc(selection) {
   // Load SVG and append it to the node only if filepath is specified and exists
   selection.each(function(d) {
@@ -555,7 +555,7 @@ Demonstration of 'Expand' and 'Reset' action
 
 For this section below the network, I built a scatterplot and bubble chart with D3.js. These two charts were created with reusability, interactivity and dynamic data updates in mind, hence followed a similar structure as the network generating function.
 
-Thesse charts were rendered inside React components, which then called from the `Dashboard` component.
+Thesse charts were rendered inside React components, which were then called from the `Dashboard` component.
 
 # Challenges faced
 
