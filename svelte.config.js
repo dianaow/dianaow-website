@@ -1,33 +1,28 @@
 import adapter from '@sveltejs/adapter-netlify';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { mdsvex, escapeSvelte } from 'mdsvex';
+import * as shiki from 'shiki';  // Importing from latest version of Shiki
+import { rosePineMoon } from './themes/rose-pine-moon.js';
 
-import { mdsvex, escapeSvelte } from 'mdsvex'
-import { getHighlighter } from 'shiki'
+let cachedHighlighter = null;
 
-// function rangeParser(ranges) {
-//   const result = [];
-//   const parts = ranges.split(',');
-
-//   for (let part of parts) {
-//     if (part.includes('-')) {
-//       const [start, end] = part.split('-').map(Number);
-//       for (let i = start; i <= end; i++) {
-//         result.push(i);
-//       }
-//     } else {
-//       result.push(Number(part));
-//     }
-//   }
-
-//   return result;
-// }
+const getCachedHighlighter = async () => {
+    if (!cachedHighlighter) {
+        try {
+            cachedHighlighter = await shiki.createHighlighter({
+                theme: rosePineMoon,  // Single theme
+                langs: ['javascript', 'typescript', 'svelte', 'python', 'jsx']
+            });
+        } catch (error) {
+            console.error("Error initializing highlighter: ", error);
+            throw error;
+        }
+    }
+    return cachedHighlighter;
+};
 
 const highlightCode = async (code, lang, meta) => {
-	const shikiHighlighter = await getHighlighter({
-		themes: ['rose-pine-moon'],
-		langs: ['javascript', 'typescript', 'svelte', 'python', 'jsx']
-	})
-	await shikiHighlighter.loadLanguage('javascript', 'typescript', 'python')
+	const shikiHighlighter = await getCachedHighlighter();
 	let html;
 	let blockName = '';
 
@@ -36,47 +31,31 @@ const highlightCode = async (code, lang, meta) => {
 		meta = null;
 	}
 
-	// if (!meta) {
-		html = escapeSvelte(shikiHighlighter.codeToHtml(code, { lang , theme: 'rose-pine-moon'}));
-	// } else {
-	// 	const highlightMetaMatch = /{([\\d,-]+)}/.exec(meta);
-	// 	const highlightMeta = highlightMetaMatch ? highlightMetaMatch[1] : '';
-	// 	const highlightLines = rangeParser(highlightMeta);
-	// 	console.log(meta, highlightLines)
-	// 	html = escapeSvelte(shikiHighlighter.codeToHtml(code, {
-	// 		lang,
-	// 		theme: 'rose-pine-moon',
-	// 		lineOptions: highlightLines.map((element) => ({
-	// 			line: element,
-	// 			classes: ['highlight-line'],
-	// 		})),
-	// 	}));
-	// }
+	html = escapeSvelte(shikiHighlighter.codeToHtml(code, { lang , theme: rosePineMoon}));
 
 	if (blockName) {
 		html = `<div class="code-block-title">${blockName}</div>${html}`;
 	}
 
 	return html
-}
+};
 
 const mdsvexOptions = {
-	extensions: ['.md', '.svelte'],
-	highlight: {
-		highlighter: highlightCode
-	}
-}
+    extensions: ['.md', '.svelte'],
+    highlight: {
+        highlighter: highlightCode,
+    },
+};
 
 const config = {
-	extensions: ['.svelte', '.svx', '.md'],
-	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
-	kit: {
-		adapter: adapter()
-	},
-	files: {
-		// Include multiple folders by separating them with commas
-		assets: ['src/posts/knowledge-graph-rag/images', 'src/posts/knowledge-graph-llm/images']
-  }
-}
+    extensions: ['.svelte', '.svx', '.md'],
+    preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
+    kit: {
+        adapter: adapter(),
+    },
+    // files: {
+    //     assets: ['src/posts/knowledge-graph-rag/images', 'src/posts/knowledge-graph-llm/images'],
+    // },
+};
 
-export default config
+export default config;
