@@ -6,7 +6,7 @@ categories:
   - Nextjs
   - Tailwind CSS
 published: true
-thumbnail_url: "https://raw.githubusercontent.com/dianaow/er-network/main/userflow_er.gif"
+thumbnail_url: "https://raw.githubusercontent.com/dianaow/dianaow-website/main/static/collage.jpeg"
 ---
 
 <script lang="ts">
