@@ -9,17 +9,12 @@ published: true
 thumbnail_url: "https://raw.githubusercontent.com/dianaow/dianaow-website/main/static/collage.jpeg"
 ---
 
-<script lang="ts">
-  import search_page1 from './images/search_page1.png'
-</script>
 
 I have been building many MVPs and prototypes for clients from the ground up that I have decided to document/share my creation process of one such project in the form of a weekly diary. 
 
 # What I will be building
 A web-responsive search engine and results interface, with a network visualization dashboard amongst various charts.
-The web application only has two screens, the search and dashboard page, and is served with mock data in the form of csv files (as of now). However, the intention is to create API routes
-
-The client will be using this prototype for demonstration and presentation purposes to potential investors and stakeholders.
+The web application only has two screens, the search and dashboard page, and is served with mock data in the form of CSV files as of now.
 
 # Work Done
 The design of the search page was done directly with code. I took inspiration from Vercel and Github's clean and light-themed site design.
@@ -398,14 +393,10 @@ I think I should have included this sort option in my earlier prompt.
 
 The client provided feedback that there isn't a need to display all search result information at once, and suggested tabs at the left side to show each table one at a time, which I will fix next week.
 
-<figure>
-  <img src={search_page1} alt="Search page 1"/>
-</figure>
-
 
 ## Network Visualization Dashboard
 
-I have my own D3.js network generating function reused and honed across many client projects. It was quick and easy to configure and create a network based on the data with simple interactivity such as hover tooltip. Next week, I will focus on adding a timeline and node click events to dyanamically update the graph, something that I have done 
+I have my own D3.js network generating function reused and honed across many client projects. It was quick and easy to configure and create a network based on the data with simple interactivity such as hover tooltip. Next week, I will focus on adding a timeline and click events to dyanamically update the graph.
 
 On this `Dashboard` component, I also created other tables to show information related to the entity.
 

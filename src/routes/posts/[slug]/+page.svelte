@@ -8,7 +8,8 @@
 <svelte:head>
 	<title>{data.meta.title}</title>
 	<meta property="og:type" content="article" />
-	<meta property="og:title" content={data.meta.title} />
+	<meta property="og:title" content={data.meta.thumbnail} />
+	<meta property="og:image" content="URL_to_your_image"/>
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:site" content="@notforcasual">
 	<meta name="twitter:title" content={data.meta.title} >

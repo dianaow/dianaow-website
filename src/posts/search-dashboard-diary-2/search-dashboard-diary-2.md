@@ -555,7 +555,7 @@ Demonstration of 'Expand' and 'Reset' action
 
 For this section below the network, I built a scatterplot and bubble chart with D3.js. These two charts were created with reusability, interactivity and dynamic data updates in mind, hence followed a similar structure as the network generating function.
 
-Thesse charts were rendered inside React components, which were then called from the `Dashboard` component.
+These charts were rendered inside React components, which were then called from the `Dashboard` component.
 
 # Challenges faced
 
@@ -563,7 +563,7 @@ Whilst a graph/network data structure seem all too familiar to me, it's not with
 
 The client mentioned having datasets for the prototype, but it turned out that the time series of relationships for the network and other charts' datasets didn't exist. Although creating mock data might seem quick, it still requires my time and effort. He provided only a list of events and an array of entities and relationships, but not the full time series dataset needed for the graph. I had to manually construct the dataset so that hovering over a specific timestamp would reveal the corresponding snapshot of the graph. Ulimately, there were also various adjustments needed to finalize the prototype for client approval. These were addressed throughout the third week. 
 
-Instead of receiving a detailed Scope of Work document and Figma design, the client's vision for the prototype was conveyed during a face-to-face meeting. I realized later that I missed some of his verbal instructions, with amounted to a sizeable list of new to-dos. This includes interactively updating the table content next to the scatter plot when a datapoint is hovered, dim entry effect of ndoes, the 'Expand' and 'Reset' feature of the network viz.
+Instead of receiving a detailed Scope of Work document and Figma design, the client's vision for the prototype was conveyed during a face-to-face meeting. I realized later that I missed some of his verbal instructions, with amounted to a sizeable list of new to-dos. This includes interactively updating the table content next to the scatter plot when a datapoint is hovered, dim entry effect of nodes, the 'Expand' and 'Reset' feature of the network viz.
 
 Fortunately, adding these features wasn't too difficult with my network and chart rendering functions. However, together, these overlooked features significantly impacted my initial cost evaluation.
 
@@ -572,7 +572,7 @@ Fortunately, adding these features wasn't too difficult with my network and char
 
 Writing clean code that not only accomplishes the task but can be easily referenced or reused even years later is incredibly satisfying.
 
-By mid of Week 2, I realized that I had underestimated the number of tasks in this project. I still struggle to break down project tasks with precise detail, which is crucial for fixed-rate projects. In fact, I think it is practically impossible to list out all tasks as bullet points expanded into multiple layers of sub-points, with time and cost estimates for each. When I feel underpaid, I usually try to renegotiate a higher fee, especially if both the client and I agree that the work is good quality and on the right track. Sometimes, this approach will not work.
+By mid of Week 2, I realized that I had underestimated the number of tasks in this project. I still struggle to break down project tasks with precise detail, which is crucial for fixed-rate projects. In fact, I think it is practically impossible to list out all tasks as bullet points expanded into multiple layers of sub-points, with time and cost estimates for each. When I feel underpaid, I usually try to re-negotiate a higher fee, especially if both the client and I agree that the work is good quality and on the right track. Sometimes, this approach will not work.
 
 Instead of depending on the client's trust, it's crucial to accurately scope the project from the outset and include a sufficient buffer to ensure your fee surpasses your initial estimate, to ensure that you're covered for any unexpected challenges or additional work that may arise, preventing potential shortfalls in your compensation. Always ask the client to provide a detailed Scope of Work (SOW) alongside the contract, particularly if they emphasize that the app needs to be built according to their specific vision within a fixed fee. Take the time to review and edit it further until you are comfortable with it. In my own contract, I noticed that it only contained brief bullet points of few sentences. This is not a SOW. While this may seem like common sense, I want to emphasize the importance of this approach to both myself and others.
 

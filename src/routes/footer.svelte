@@ -42,7 +42,7 @@
     <div class="pb-8 space-y-2">
       <p class="text-xl font-bold">Please reach out to me on 
       <a class="text-xl" href="https://contra.com/dianaow_viz" target="_blank">Contra</a> or 
-      <a  class="text-xl"href="https://www.upwork.com/freelancers/dianaow" target="_blank">Upwork</a> 
+      <a  class="text-xl"href="https://www.upwork.com/freelancers/~013634b9f2905dd521?mp_source=share" target="_blank">Upwork</a> 
       if you are interested to hire me or work together on a project!</p>
     </div>
     <div class="mt-8 flex space-x-10">
