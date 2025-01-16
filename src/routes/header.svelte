@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<nav class="px-8 md:px-12 py-8 lg:flex justify-between items-center">
+<nav class="py-8 lg:flex justify-between items-center">
 	<a href="/" class="title">
 		<svg class="textSVG" width="200" height="auto" viewBox="0 0 1100 300">
 			<g id="svgGroup" stroke-linecap="round" fill-rule="evenodd" stroke="#fff" stroke-width="0.25mm" fill="none" style="stroke:#fff;fill:none">
@@ -18,9 +18,6 @@
   /> -->
 
 	<ul class="flex flex-wrap space-x-5 lg:space-x-8">
-		<div>
-			<a href="/about">About</a>
-		</div>
     <div>
 			<a href="/posts">Blog</a>
 		</div>

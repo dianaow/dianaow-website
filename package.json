@@ -39,6 +39,8 @@
 		"@fontsource/poppins": "^5.0.12",
 		"@sveltejs/adapter-netlify": "^4.1.0",
 		"googleapis": "^134.0.0",
+		"interval-tree-1d": "^1.0.4",
+		"pixi.js": "^8.6.6",
 		"shiki": "^1.16.2"
 	}
 }

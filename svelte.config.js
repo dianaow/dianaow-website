@@ -11,7 +11,7 @@ const getCachedHighlighter = async () => {
         try {
             cachedHighlighter = await shiki.createHighlighter({
                 theme: rosePineMoon,  // Single theme
-                langs: ['javascript', 'typescript', 'svelte', 'python', 'jsx']
+                langs: ['javascript', 'typescript', 'svelte', 'python', 'jsx', 'html']
             });
         } catch (error) {
             console.error("Error initializing highlighter: ", error);
@@ -31,7 +31,7 @@ const highlightCode = async (code, lang, meta) => {
 		meta = null;
 	}
 
-	html = escapeSvelte(shikiHighlighter.codeToHtml(code, { lang , theme: rosePineMoon}));
+	html = escapeSvelte(shikiHighlighter.codeToHtml(code, { lang , theme: rosePineMoon }));
 
 	if (blockName) {
 		html = `<div class="code-block-title">${blockName}</div>${html}`;

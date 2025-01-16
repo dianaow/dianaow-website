@@ -1,159 +1,557 @@
 <script>
-    import biovitals_demo from '$lib/images/biovitals-demo.jpeg';
-    import fifa19_binned from '$lib/images/fifa19_binned.png';
-    import svelte_dashboard from '$lib/images/svelte_dashboard.png';
-    import health_timeline_mockup_simple from '$lib/images/health_timeline_mockup_simple.png';
-    import vizforsocialgood_network from '$lib/images/vizforsocialgood-network.png';
-    import covid_network from '$lib/images/covid_network.png';
-    import d3_force from '$lib/images/d3-force-collection-demo.gif';
-    import data_visualizers from '$lib/images/data-visualizers.gif';
-    import leaflet_dash_map from '$lib/images/leaflet_dash_map.png';
-    import kiron_full from '$lib/images/kiron_full.png';
+  import { onMount, onDestroy } from 'svelte';
+  import { Application, Assets, Sprite, Container, SCALE_MODES, RenderTexture } from 'pixi.js';
+  import { fade, fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
+  import data from '$lib/data/metadata.json';
+  import { RectArrangement } from '$lib/helper/rectpacking.js';
+
+  let hoveredTitle = null;
+  let pixiContainer;
+  let app;
+  let sprites = [];
+  let selectedProject = null;
+  let isDragging = false;
+  let isClustered = false;
+  let dragStartTime = 0;
+  let isFullscreenReady = false;
+  const DRAG_THRESHOLD = 200; // milliseconds
+
+  function calculateGridPositions(rectangles, width, height) {
+    const sa = new RectArrangement([width * 0.65, height]);
+
+    let n = 0;
+    let coords = []
+    for (const [area, ratio] of rectangles) {
+      sa.addRect(area, ratio);
+      n++;
+    }
+    
+    for (let s of sa.rects) {
+      let [x0, y0] = s[0].p
+      coords.push({ x: x0 + 50, y: y0 - height/2 })
+    }
+    return coords;
+  }
+
+  // Add this function to properly load assets
+  async function loadAsset(path) {
+      try {
+          // First add the asset
+          await Assets.add({ alias: 'uniqueId_' + path, src: path });
+          // Then load it
+          return await Assets.load('uniqueId_' + path);
+      } catch (error) {
+          console.error('Error loading asset:', path, error);
+          return null;
+      }
+  }
+
+  // Add this function to handle clustering toggle
+  const toggleClusterLayout = () => {
+    isClustered = !isClustered;
+    
+    const rects = sprites.map(sprite => [sprite.width * sprite.height, sprite.width/sprite.height])
+
+    const positions = isClustered ? 
+      calculateGridPositions(rects, app.screen.width, app.screen.height) :
+      sprites.map(sprite => {
+        const pos = getRandomPosition(sprite, sprites, app.screen.width, app.screen.height);
+        return { x: pos.x, y: pos.y };
+      });
+
+    // Animate sprites to new positions
+    sprites.forEach((sprite, index) => {
+      const targetPos = positions[index];
+      
+      // Store original rotation for scattered layout
+      if (!isClustered) {
+        sprite.userData.targetRotation = (Math.random() * 30 - 15) * Math.PI / 180;
+      }
+      
+      const animate = () => {
+        const dx = (targetPos.x - sprite.x) * 0.1;
+        const dy = (targetPos.y - sprite.y) * 0.1;
+        const targetRotation = isClustered ? 0 : sprite.userData.targetRotation;
+        const dr = (targetRotation - sprite.rotation) * 0.1;
+
+        sprite.x += dx;
+        sprite.y += dy;
+        sprite.rotation += dr;
+
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || Math.abs(dr) > 0.001) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      animate();
+    });
+  };
+
+  // Helper function to check if two sprites overlap
+  const checkOverlap = (pos1, size1, pos2, size2, threshold = 0.8) => {
+    const bounds1 = {
+      left: pos1.x - size1.width / 2,
+      right: pos1.x + size1.width / 2,
+      top: pos1.y - size1.height / 2,
+      bottom: pos1.y + size1.height / 2
+    };
+
+    const bounds2 = {
+      left: pos2.x - size2.width / 2,
+      right: pos2.x + size2.width / 2,
+      top: pos2.y - size2.height / 2,
+      bottom: pos2.y + size2.height / 2
+    };
+
+    // Calculate overlap area
+    const xOverlap = Math.max(0, Math.min(bounds1.right, bounds2.right) - Math.max(bounds1.left, bounds2.left));
+    const yOverlap = Math.max(0, Math.min(bounds1.bottom, bounds2.bottom) - Math.max(bounds1.top, bounds2.top));
+    const overlapArea = xOverlap * yOverlap;
+    
+    // Calculate minimum area
+    const area1 = size1.width * size1.height;
+    const area2 = size2.width * size2.height;
+    const minArea = Math.min(area1, area2);
+    
+    return (overlapArea / minArea) > threshold;
+  };
+  
+  // Helper function to get random position within bounds with overlap checking
+  const getRandomPosition = (newSprite, existingSprites, canvasWidth, canvasHeight, maxAttempts = 50) => {
+    const margin = 0.1; // 10% margin for edge overlap
+    const spriteWidth = newSprite.width;
+    const spriteHeight = newSprite.height;
+    
+    // Set z-index based on priority
+    if (newSprite.userData?.priority) {
+      newSprite.zIndex = 1000; // High z-index for priority items
+    } else {
+      newSprite.zIndex = 1; // Default z-index for non-priority items
+    }
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const pos = {
+        x: (canvasWidth*0.3) + Math.random() * ((canvasWidth*0.65) - spriteWidth * (1 - margin * 2)) + spriteWidth * margin,
+        y: Math.random() * (canvasHeight - spriteHeight * (1 - margin * 2)) + spriteHeight * margin
+      };
+
+      // For priority items, we only check overlap with other priority items
+      // For non-priority items, we check overlap with all items
+      let hasOverlap = false;
+      for (const sprite of existingSprites) {
+        if (newSprite.userData?.priority) {
+          // Priority items only check overlap with other priority items
+          if (sprite.userData?.priority && checkOverlap(
+            pos, 
+            { width: spriteWidth, height: spriteHeight },
+            { x: sprite.x, y: sprite.y },
+            { width: sprite.width, height: sprite.height }
+          )) {
+            hasOverlap = true;
+            break;
+          }
+        } else {
+          // Non-priority items check overlap with all items
+          if (checkOverlap(
+            pos, 
+            { width: spriteWidth, height: spriteHeight },
+            { x: sprite.x, y: sprite.y },
+            { width: sprite.width, height: sprite.height }
+          )) {
+            hasOverlap = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasOverlap) return pos;
+    }
+
+    // Fallback position if no non-overlapping position is found
+    return {
+      x: Math.random() * (canvasWidth - spriteWidth * (1 - margin * 2)) + spriteWidth * margin,
+      y: Math.random() * (canvasHeight - spriteHeight * (1 - margin * 2)) + spriteHeight * margin
+    };
+  };
+
+  // Make sprite draggable
+  const makeSpriteDraggable = (app, sprite) => {
+    sprite.eventMode = 'static';
+    sprite.cursor = 'grab';
+    
+    let dragOffset = { x: 0, y: 0 };
+
+    sprite
+      .on('pointerdown', (event) => {
+        isDragging = false;
+        dragStartTime = Date.now();
+        sprite.cursor = 'grabbing';
+        sprite.alpha = 0.8;
+        sprite.zIndex = Math.max(...sprites.map(s => s.zIndex)) + 1;
+
+        const globalPosition = event.global;
+        dragOffset.x = sprite.x - globalPosition.x;
+        dragOffset.y = sprite.y - globalPosition.y;
+
+        sprite.addEventListener('globalpointermove', onDragMove);
+      });
+
+    function onDragMove(event) {
+      isDragging = true;
+      const globalPosition = event.global;
+      sprite.x = globalPosition.x + dragOffset.x;
+      sprite.y = globalPosition.y + dragOffset.y;
+    }
+
+    sprite.on('pointerup', (event) => {
+        endDrag();
+        // Only handle click events when not clustered
+        if (!isClustered && !isDragging && (Date.now() - dragStartTime) < DRAG_THRESHOLD) {
+          const projectData = data.find(item => item.title === sprite.userData.title);
+          if (projectData) {
+            handleProjectSelect(app, projectData, sprite);
+          }
+        }
+      })
+      .on('pointerupoutside', endDrag);
+
+    function endDrag() {
+      sprite.cursor = 'grab';
+      sprite.alpha = 1;
+      sprite.removeEventListener('globalpointermove', onDragMove);
+    }
+  };
+
+  const initPixi = async () => {
+    if (!pixiContainer) return;
+
+    // Initialize PixiJS Application with v8 options
+    const app = new Application();
+    
+    // Intialize the application.
+    await app.init({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      backgroundColor: '#020617',
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true,
+    });
+
+    // Add canvas to the DOM
+    pixiContainer.appendChild(app.canvas);
+
+    // Create a container for all sprites
+    const container = new Container();
+    app.stage.addChild(container);
+    
+    // Load all textures
+    try {
+      await Promise.all(data.reverse().map(async (item, index) => {
+        // Load texture
+        const texture = await loadAsset(item.image);
+        if(!texture) return
+
+        // Create sprite with the scaled texture
+        const sprite = new Sprite(texture);
+
+        // Set sprite properties
+        //sprite.anchor.set(0.5);
+        
+        // Set random scale 
+        const scale = (app.screen.width < 1600 ? 0.09 : 0.12) + Math.random() * 0.03; 
+        sprite.scale.set(scale);
+        
+        // Get position with minimal overlap
+        const pos = getRandomPosition(sprite, sprites, app.screen.width, app.screen.height);
+        sprite.x = pos.x;
+        sprite.y = pos.y;
+
+        // Random rotation (-15 to 15 degrees)
+        sprite.rotation = (Math.random() * 30 - 15) * Math.PI / 180;
+        sprite.alpha = 1;
+        
+        // Store reference to title for hover effect
+        sprite.userData = { title: item.title };
+        
+        makeSpriteDraggable(app, sprite);
+
+        // Add to our sprites array and to the container
+        sprites.push(sprite);
+        container.addChild(sprite);
+
+      }));
+    } catch (error) {
+      console.error('Error loading textures:', error);
+    }
+
+    // Animation ticker
+    app.ticker.add(() => {
+      sprites.forEach(sprite => {
+        if (!sprite.dragging) {
+          const targetAlpha = (hoveredTitle === null || hoveredTitle === sprite.userData.title) ? 1 : 0;
+          sprite.alpha += (targetAlpha - sprite.alpha) * 0.1;
+        }
+      });
+    });
+
+    return app
+  };
+
+  // Actions to take when a sprite is clicked
+  function handleProjectSelect(app, project, sprite) {
+    selectedProject = project;
+    
+    // Hide all other sprites
+    sprites.forEach(s => {
+      if (s !== sprite) {
+          s.visible = false;
+      }
+      s.eventMode = 'none';
+    });
+
+    // Store original properties for reverting later
+    sprite.userData = {
+        ...sprite.userData,
+        originalPosition: {
+            x: sprite.x,
+            y: sprite.y,
+            scale: sprite.scale.x,
+            rotation: sprite.rotation
+        }
+    };
+
+    // Calculate target position and scale
+    const targetX = app.screen.width/4;
+    const targetY = 0;
+    const scale = ((app.screen.width * 0.75) / sprite.width) * sprite.scale.x;
+    const targetRotation = 0;
+
+    const animate = () => {
+        const dx = (targetX - sprite.x) * 0.1;
+        const dy = (targetY - sprite.y) * 0.1;
+        const dScale = (scale - sprite.scale.x) * 0.1;
+        const dRotation = (targetRotation - sprite.rotation) * 0.1;
+
+        sprite.x += dx;
+        sprite.y += dy;
+        // In v8, scale is still set the same way
+        sprite.scale.set(sprite.scale.x + dScale);
+        sprite.rotation += dRotation;
+        
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || Math.abs(dScale) > 0.001) {
+            // Use the new v8 Ticker.shared.add pattern if not using requestAnimationFrame
+            requestAnimationFrame(animate);
+        } else {
+            isFullscreenReady = true;
+        }
+    };
+
+    animate();
+  }
+
+  function exitFullscreen() {
+    isFullscreenReady = false;
+    
+    // Find the original sprite
+    const sprite = sprites.find(s => s.userData.title === selectedProject.title);
+    
+    if (sprite?.userData?.originalPosition) {
+        const { x: targetX, y: targetY, scale: targetScale, rotation: targetRotation } 
+            = sprite.userData.originalPosition;
+
+        const animate = () => {
+            const dx = (targetX - sprite.x) * 0.1;
+            const dy = (targetY - sprite.y) * 0.1;
+            const dScale = (targetScale - sprite.scale.x) * 0.1;
+            const dRotation = (targetRotation - sprite.rotation) * 0.1;
+
+            sprite.x += dx;
+            sprite.y += dy;
+            sprite.scale.set(sprite.scale.x + dScale);
+            sprite.rotation += dRotation;
+
+            if (Math.abs(dx) > 0.1 || 
+                Math.abs(dy) > 0.1 || 
+                Math.abs(dScale) > 0.001 ||
+                Math.abs(dRotation) > 0.001) {
+                requestAnimationFrame(animate);
+            } else {
+                // Clean up stored original position
+                delete sprite.userData.originalPosition;
+            }
+        };
+
+        // Show all sprites again
+        sprites.forEach(s => {
+            s.visible = true;
+            s.eventMode = 'static'; // Reset to v8's default interactive mode
+        });
+
+        animate();
+    }
+    
+    selectedProject = null;
+  }
+
+  function handleKeydown(event) {
+    // Only handle escape if PixiJS is initialized and we have a selected project
+    if (event.key === 'Escape' && isPixiInitialized && selectedProject) {
+        exitFullscreen();
+    }
+  }
+  
+  // Handle window resizing
+  function handleResize() {
+    if (app) {
+      app.renderer.resize(window.innerWidth, window.innerHeight);
+      
+      if (isClustered) {
+        const positions = calculateGridPositions(sprites, app.screen.width, app.screen.height);
+        sprites.forEach((sprite, index) => {
+          sprite.x = positions[index].x;
+          sprite.y = positions[index].y;
+        });
+      } else {
+        sprites.forEach((sprite, index) => {
+          const pos = getRandomPosition(sprite, sprites.slice(0, index), app.screen.width, app.screen.height);
+          sprite.x = pos.x;
+          sprite.y = pos.y;
+        });
+      }
+    }
+  }
+
+  // Table row hover handler
+  function handleRowHover(title) {
+    hoveredTitle = title;
+    //console.log('Hovering:', title);
+  }
+
+  function handleRowClick(title) {
+    hoveredTitle = title;
+    const project = data.find(item => item.title === title);
+    const sprite = sprites.find(s => s.userData.title === title);
+    handleProjectSelect(app, project, sprite)
+  }
+
+  onMount(async () => {
+    app = await initPixi();
+    if(app) {
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('keydown', handleKeydown);
+    }
+  });
+
+  onDestroy(() => {
+    if (app) {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeydown);
+      app.destroy(true, { children: true, texture: true, baseTexture: true });
+    }
+  });
 </script>
 
-<div class='text-center'>
-  <div class='flex justify-center items-center px-10 lg:px-20'>
-    <svg viewBox="0 0 750 220">
-      <g id="svgGroup" stroke-linecap="round" fill-rule="evenodd" stroke="#fff" stroke-width="0.25mm" fill="none" style="stroke:#fff;fill:none">
-          <path d="M 565.75 120.251 L 565.75 201.251 L 523 201.251 L 523 125.251 A 42.762 42.762 0 0 0 522.138 116.396 Q 520.972 110.886 518.226 106.688 A 24.272 24.272 0 0 0 515.625 103.376 A 24.474 24.474 0 0 0 500.422 95.778 A 34.228 34.228 0 0 0 496 95.501 Q 483 95.501 475.375 103.751 A 26.845 26.845 0 0 0 469.453 114.399 Q 468.202 118.544 467.87 123.532 A 55.969 55.969 0 0 0 467.75 127.251 L 467.75 201.251 L 425 201.251 L 425 61.751 L 467.75 61.751 L 467.75 87.251 Q 473.75 74.751 485.625 67.501 A 49.257 49.257 0 0 1 504.768 60.833 A 63.644 63.644 0 0 1 513.5 60.251 A 58.066 58.066 0 0 1 530.586 62.644 A 45.282 45.282 0 0 1 551.625 76.251 A 53.472 53.472 0 0 1 562.949 97.693 Q 565.203 105.812 565.643 115.471 A 105 105 0 0 1 565.75 120.251 Z M 66.75 201.251 L 0 201.251 L 0 24.501 L 66.75 24.501 A 124.538 124.538 0 0 1 90.204 26.607 A 91.495 91.495 0 0 1 116 35.501 Q 136.75 46.501 147.875 66.501 A 88.186 88.186 0 0 1 158.215 99.112 A 111.343 111.343 0 0 1 159 112.501 A 103.508 103.508 0 0 1 155.86 138.468 A 85.875 85.875 0 0 1 147.875 158.626 Q 136.75 178.751 115.875 190.001 Q 95 201.251 66.75 201.251 Z M 353 87.001 L 353 61.751 L 395.5 61.751 L 395.5 201.251 L 353 201.251 L 353 176.001 Q 347.5 188.501 336 195.751 A 46.345 46.345 0 0 1 318.968 202.144 A 61.562 61.562 0 0 1 308.5 203.001 A 58.925 58.925 0 0 1 287.901 199.467 A 54.525 54.525 0 0 1 277.625 194.376 Q 264 185.751 256.125 169.501 Q 248.25 153.251 248.25 131.501 A 103.801 103.801 0 0 1 249.757 113.376 A 75.289 75.289 0 0 1 256.125 93.376 A 64.602 64.602 0 0 1 266.286 78.171 A 55.009 55.009 0 0 1 277.625 68.626 A 55.987 55.987 0 0 1 306.225 60.039 A 67.598 67.598 0 0 1 308.5 60.001 A 59.164 59.164 0 0 1 322.076 61.49 A 45.394 45.394 0 0 1 336 67.251 Q 347.5 74.501 353 87.001 Z M 691.5 87.001 L 691.5 61.751 L 734 61.751 L 734 201.251 L 691.5 201.251 L 691.5 176.001 Q 686 188.501 674.5 195.751 A 46.345 46.345 0 0 1 657.468 202.144 A 61.562 61.562 0 0 1 647 203.001 A 58.925 58.925 0 0 1 626.401 199.467 A 54.525 54.525 0 0 1 616.125 194.376 Q 602.5 185.751 594.625 169.501 Q 586.75 153.251 586.75 131.501 A 103.801 103.801 0 0 1 588.257 113.376 A 75.289 75.289 0 0 1 594.625 93.376 A 64.602 64.602 0 0 1 604.786 78.171 A 55.009 55.009 0 0 1 616.125 68.626 A 55.987 55.987 0 0 1 644.725 60.039 A 67.598 67.598 0 0 1 647 60.001 A 59.164 59.164 0 0 1 660.576 61.49 A 45.394 45.394 0 0 1 674.5 67.251 Q 686 74.501 691.5 87.001 Z M 183.25 61.751 L 226 61.751 L 226 201.251 L 183.25 201.251 L 183.25 61.751 Z M 63 62.001 L 42.75 62.001 L 42.75 163.001 L 63 163.001 A 75.873 75.873 0 0 0 78.541 161.506 Q 88.194 159.485 95.553 154.734 A 42.532 42.532 0 0 0 101.875 149.751 A 43.204 43.204 0 0 0 113.958 128.363 Q 115.75 121.126 115.75 112.501 Q 115.75 90.47 104.058 77.497 A 41.808 41.808 0 0 0 101.875 75.251 A 45.554 45.554 0 0 0 82.114 64.359 Q 75.153 62.443 66.885 62.084 A 89.51 89.51 0 0 0 63 62.001 Z M 322.25 97.501 A 34.035 34.035 0 0 0 312.056 98.958 A 27.081 27.081 0 0 0 300.125 106.501 Q 292.419 114.783 291.803 128.991 A 58.029 58.029 0 0 0 291.75 131.501 A 49.172 49.172 0 0 0 292.728 141.621 Q 294.613 150.577 300.125 156.501 A 27.792 27.792 0 0 0 318.084 165.281 A 38.461 38.461 0 0 0 322.25 165.501 A 32.137 32.137 0 0 0 333.307 163.667 A 28.136 28.136 0 0 0 344.375 156.251 A 31.198 31.198 0 0 0 351.981 141.419 A 45.716 45.716 0 0 0 353 131.501 A 46.411 46.411 0 0 0 351.91 121.141 Q 350.185 113.603 345.729 108.164 A 28.893 28.893 0 0 0 344.375 106.626 Q 335.75 97.501 322.25 97.501 Z M 660.75 97.501 A 34.035 34.035 0 0 0 650.556 98.958 A 27.081 27.081 0 0 0 638.625 106.501 Q 630.919 114.783 630.303 128.991 A 58.029 58.029 0 0 0 630.25 131.501 A 49.172 49.172 0 0 0 631.228 141.621 Q 633.113 150.577 638.625 156.501 A 27.792 27.792 0 0 0 656.584 165.281 A 38.461 38.461 0 0 0 660.75 165.501 A 32.137 32.137 0 0 0 671.807 163.667 A 28.136 28.136 0 0 0 682.875 156.251 A 31.198 31.198 0 0 0 690.481 141.419 A 45.716 45.716 0 0 0 691.5 131.501 A 46.411 46.411 0 0 0 690.41 121.141 Q 688.685 113.603 684.229 108.164 A 28.893 28.893 0 0 0 682.875 106.626 Q 674.25 97.501 660.75 97.501 Z M 179.25 22.501 Q 179.25 12.751 186.25 6.376 A 23.856 23.856 0 0 1 197.668 0.691 A 34.528 34.528 0 0 1 204.75 0.001 A 33.721 33.721 0 0 1 212.742 0.898 A 23.615 23.615 0 0 1 223.25 6.376 A 20.726 20.726 0 0 1 230.229 21.445 A 26.415 26.415 0 0 1 230.25 22.501 A 21.052 21.052 0 0 1 227.973 32.321 A 21.624 21.624 0 0 1 223.25 38.376 A 23.856 23.856 0 0 1 211.832 44.061 A 34.528 34.528 0 0 1 204.75 44.751 A 33.721 33.721 0 0 1 196.758 43.855 A 23.615 23.615 0 0 1 186.25 38.376 A 20.5 20.5 0 0 1 179.271 23.531 A 25.114 25.114 0 0 1 179.25 22.501 Z" vector-effect="non-scaling-stroke"/>
-      </g>
-    </svg>
+<div class="flex h-screen w-full">
+  <div class="absolute top-20 left-0 w-full h-full" bind:this={pixiContainer}>
+    {#if !isFullscreenReady}
+      <button 
+        class="absolute top-0 right-4 px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors"
+        on:click={toggleClusterLayout}
+      >
+        {isClustered ? 'Scatter' : 'Cluster'}
+      </button>
+    {/if}
   </div>
-  <h1>data viz | web dev</h1>
+  {#if !isFullscreenReady}
+    <div class="absolute top-20 left-0 w-1/3 p-8 h-screen">
+      <p class="pb-5">Web Developer with interest in data visualizations. I build data-rich web applications, interactive visual interfaces and data dashboards.</p>
+      <ul class="list-disc pb-5">
+        <li class='text-xs p-0 m-0'>D3.js</li>
+        <li class='text-xs p-0 m-0'>Pixi.js</li>
+        <li class='text-xs p-0 m-0'>Svelte / Sveltekit</li>
+        <li class='text-xs p-0 m-0'>React / Next.js</li>
+        <li class='text-xs p-0 m-0'>Plotly Dash</li>
+      </ul>
 
-  <h2 class='mt-8 md:mt-20'>Dashboards</h2>   
-
-  <div class='block md:flex px-4'>      
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={biovitals_demo} alt="Portfolio">
-      <a href="https://www.biofourmis.com/care-delivery" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Data viz library for a healthcare tech company</h2>
-          <p>D3.js</p>
-          <h4>Developed and maintained Biofourmis' data visualization library, introducing advanced chart types and enhanced interactive features befitting of high dimensional medical data.</h4>
-        </div>
-      </a>
-    </div>
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={fifa19_binned} alt="Portfolio">
-      <a href="http://fifa19-viz.s3-website-ap-southeast-1.amazonaws.com/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>FIFA 19</h2>
-          <p>React + D3.js</p>
-          <h4>Visualizing data from the football simulation video game 'FIFA 19'</h4>
-        </div>
-      </a>
-    </div>
-  </div>
-  <div class='block md:flex px-4 lg:pb-16'>      
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={svelte_dashboard} alt="Portfolio">
-      <a href="https://sveltekit-dashboard.netlify.app/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Interactive dashboard for Web3 gaming company</h2>
-          <p>Sveltekit + D3.js</p>
-          <h4>Data is filterable by date and region. As the line chart is zoomed out, the x-axis domain becomes less granular, transitioning from 10-minute intervals to 1-week intervals, while asynchronously extracting new data from an API.</h4>
-        </div>
-      </a>
-    </div>
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={health_timeline_mockup_simple} alt="Portfolio">
-      <a href="https://dianaow.com/posts/health_timeline/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Web-based tool for monitoring clinical data</h2>
-          <p>D3.js</p>
-          <h4>Worked together with a subject matter expert to bring his visual design of a dashboard to life, creating an interactive timeline visualization, to bring unique, usable and effective data visualizations into the daily work life of clinicians.</h4>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <h2>Network Visualizations</h2> 
-
-  <div class='block md:flex px-4 lg:pb-16'>      
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={vizforsocialgood_network} alt="Portfolio">
-      <a href="https://vizforsocialgood-network.netlify.app/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>Network of Viz For Social Good contributers</h2>
-          <p>AntV's G6</p>
-          <h4>Helping Viz For Social Good (@VizFSG) visualise tracked volunteer contributions to all projects since 2017 with a network.</h4>
-        </div>
-      </a>
-    </div>
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={covid_network} alt="Portfolio">
-      <a href="http://covid19-singapore.s3-website-ap-southeast-1.amazonaws.com/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2 class='m-0'>COVID-19 Network Singapore</h2>
-          <p>React + D3</p>
-          <h4>Visualizing the early days of the spread of COVID-19 in Singapore through animated temporal network diagrams.</h4>
-        </div>
-      </a>
-    </div>
-  </div>
-  
-  <h2>Geospatial</h2> 
-
-  <div class='block md:flex px-4 lg:pb-16'>      
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={leaflet_dash_map} loading="lazy" alt="Portfolio">
-      <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-        <h2 class='m-0'>Interactive geospatial dashboard</h2>
-        <p>Leaflet + Dash</p>
-        <h4>Developed a geospatial app for Staged Systems, a US-based technology company, to visualise fibre broadband installation sites in the US, giving client a bird-eye's view of biz operations, while able to investigate specific locations.</h4>
+      <div class="max-h-[65%] overflow-y-auto">
+        <table class="w-full border-collapse">
+          <thead class="sticky top-0 bg-slate-rev950">
+            <tr class="border-b border-gray-200">
+              <th class="text-left text-white text-sm p-2">Title</th>
+              <th class="text-left text-white text-sm p-2">Category</th>
+              <th class="text-left text-white text-sm p-2">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each data as item}
+              <tr 
+                class="border-b border-gray-200 hover:bg-slate-900 cursor-pointer"
+                on:mouseenter={() => handleRowHover(item.title)}
+                on:mouseleave={() => handleRowHover(null)}
+                on:click={() => handleRowClick(item.title)}
+              >
+              <td class="text-white text-sm p-2">{item.title}</td>
+              <td class="text-white text-sm p-2">{item.category}</td>
+              <td class="text-white text-sm p-2">{item.date}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={kiron_full} loading="lazy" alt="Portfolio">
-        <a href="https://dianameow.com/vizforsocialgood/" target="_blank">
-          <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-            <h2>Kiron</h2>
-            <p>D3.js + GeoJSON</p>
-            <h3>#vizforsocialgood</h3>
-          </div>
-        </a>
-    </div>
-  </div>
-
-  <div class='mt-8 mt-16'> 
-    <div class="border-2 border-white border-solid px-4 md:pb-16 md:px-16 space-y-6">
-      <h3>Testimonials from my clients</h3>      
-      <p class='text-sm text-left
-      '>"Diana was excellent to work with! In addition to creating a great looking visualization of my data, she was able to build off and integrate with my current codebase. Will definitively use again in the future for interactive data application. She was also well organized on scope and deliverables and finished the final product very quickly once work began." - Staged Systems</p>
-      <hr class='opacity-30'>
-      <p class='text-sm text-left
-      '>"Diana did an awesome job on taking our visualizations of Twitter activity to the next level. Not only she was able to quickly interpret and implement the features we were needing, but she also went ahead to proactively implement aesthetical improvements and code optimizations that made the visualization much more fluid and appealing. All of this was performed within budget and schedule and with a lot of attention to detail"</p> 
-      <hr class='opacity-30'>
-      <p class='text-sm text-left
-      '>"Diana was really quick to grasp what we needed for this project, and was very flexible with adapting the output to fit what we needed. She was also engaged and took a lot of initiative for adding additional functionality to the website that we had not initially considered. Her visualization was very clearly reflective of what we initially asked for. She was also very quick to respond, and her turnaround time was really quick."</p> 
-      <hr class='opacity-30'>
-      <p class='text-sm text-left
-      '>"Diana is a great collaborator in website design. She creates elegant visualization that groups my stuff into a well-organized layout. Communication with her is enjoyable, that she carefully listens and quickly responds. I would recommend her to anyone who needs high-quality interactive websites" - Huang Junming</p>
-    </div>
-  </div>
-    
-  <h2>The unusual</h2> 
-
-  <div class='block md:flex px-4 lg:pb-16'>      
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={d3_force} loading="lazy" alt="Portfolio">
-      <a href="https://d3-force-collection.netlify.com" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2>d3-force compilation</h2>
-          <h4>A compilation of d3-force simulations: their use cases and the creation methods behind them.</h4>
-        </div>
-      </a>
-    </div>
-    <div class='relative flex flex-col justify-center items-center w-full md:w-1/2 p-4'>
-      <img src={data_visualizers} loading="lazy" alt="Portfolio">
-      <a href="https://data-visualizers.netlify.app/" target="_blank">
-        <div class="p-8 text-center absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-70 flex flex-col justify-center opacity-0 hover:opacity-100 transition-opacity duration-400 ease-in-out z-10">
-          <h2>Data Visualization Society members in 2020</h2>
-          <p>PixiJS</p>
-          <h4>The Data Visualization Society released their 2020 survey results and I participated in visualizing the results, choosing to represent all respondents as animating and interactive dots on the screen.</h4>
-        </div>
-      </a>
-    </div>
-  </div>
+  {/if}
 </div>
+
+{#if selectedProject}
+  <!-- Project details -->
+  <div 
+    class="absolute top-0 left-0 z-10 w-1/4 h-full p-12 bg-slate-950 text-white pointer-events-auto"
+    transition:fly={{ x: -50, duration: 800, delay: 300, easing: cubicOut }}
+  >
+    <button
+        class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+        on:click={exitFullscreen}
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <h1 class="text-4xl font-bold mb-6">{selectedProject.title}</h1>
+    
+    <div class="space-y-8">
+      <div>
+        <p class="text-sm text-white/90">{selectedProject.description}</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold mt-3 mb-1">Category</h2>
+        <p class="text-base text-white/90 mt-1">{selectedProject.category}</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold mt-3 mb-1">Date</h2>
+        <p class="text-base text-white/90 mt-1">{selectedProject.date}</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold mt-3 mb-1">technologies</h2>
+        <p class="text-base text-white/90 mt-1">{selectedProject.technologies}</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold mt-3 mb-1">website</h2>
+        <p class="text-base text-white/90 mt-1"><a href={selectedProject.url} class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{selectedProject.title}</a></p>
+      </div>
+
+    </div>
+  </div>
+{/if}
+
+<style>
+  :global(canvas) {
+    display: block;
+    overflow: hidden;
+  }
+</style>
