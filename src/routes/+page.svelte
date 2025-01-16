@@ -466,7 +466,7 @@
   </div>
   {#if !isFullscreenReady}
     <div class="absolute top-20 left-0 w-1/3 p-8 h-screen">
-      <p class="pb-5">Web Developer with interested in data visualizations. I build data-rich web applications, interactive visual interfaces and data dashboards.</p>
+      <p class="pb-5">Web Developer with interest in data visualizations. I build data-rich web applications, interactive visual interfaces and data dashboards.</p>
       <ul class="list-disc pb-5">
         <li class='text-xs p-0 m-0'>D3.js</li>
         <li class='text-xs p-0 m-0'>Pixi.js</li>
