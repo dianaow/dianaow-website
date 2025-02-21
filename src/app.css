@@ -74,7 +74,7 @@ p, ul, li {
 }
 
 li { 
-  padding-left: 30px;
+  padding-left: 26px;
 }
 
 i {
@@ -85,7 +85,6 @@ pre {
 	padding: 1rem;
 	border-radius: 8px;
 	tab-size: 2;
-  margin: 0.5rem 0rem 3.5rem 0rem;
 }
 
 :not(pre) > code {
@@ -152,6 +151,9 @@ pre {
   overflow-x: auto; /* Enable horizontal scrolling */
   padding: 1rem; /* Optional: Add some padding */
   border-radius: 8px; /* Optional: Add rounded corners */
+  margin: 20px 0px;
+  max-height: 750px;
+  overflow-y: scroll;
 }
 code {
   position: relative;

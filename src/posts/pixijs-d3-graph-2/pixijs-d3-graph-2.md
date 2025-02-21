@@ -8,7 +8,7 @@ published: true
 ---
 
 <script lang="ts">
-  import VideoPlaceholder from './VideoPlaceholder.svelte';
+  import VideoPlaceholder from '../../components/VideoPlaceholder.svelte';
   import model2_example from './images/model2_example.png'
   import model2_example1 from './images/model2_example1.png'
   import model2_example2 from './images/model2_example2.png'  

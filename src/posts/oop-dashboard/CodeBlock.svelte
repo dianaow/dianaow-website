@@ -29,7 +29,7 @@
 
   function highlightCodeWithLines(code, lines) {
     return code.split('\n').map((line, index) => {
-      return lines.lines.includes(index) ? `<span style="padding-left: 4px; border-left: 4px solid ${getColorForLine(index)}; background-color: navy;">${line}</span>` : `<span style="padding-left: 8px;">${line}</span>`;
+      return lines.lines.includes(index) ? `<span style="padding-left: 4px; border-left: 4px solid ${getColorForLine(index)}; background-color: #3a3659;">${line}</span>` : `<span style="padding-left: 8px;">${line}</span>`;
     }).join('\n');
   }
 
