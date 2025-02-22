@@ -35,7 +35,7 @@ const useMainPageState = () => {
   `;
 
   let codeBlockComponent;
-  let highlightedLines = [];
+  let highlightedLines = {};
 
   const steps = [
   {

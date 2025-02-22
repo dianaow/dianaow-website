@@ -145,7 +145,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
   `;
 
   let codeBlockComponent;
-  let highlightedLines = [];
+  let highlightedLines = {};
 
   const steps = [
   {
@@ -155,7 +155,8 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "It's crucial for D3 integration because it provides the entry point for D3 to manipulate the DOM",
       "Using a ref here instead of querying the DOM (like document.querySelector) ensures we're always working with the correct element. The ref persists across re-renders while maintaining the same reference to the DOM element"
     ],
-    lines: [3, 134],
+    lines: [3, 97, 134],
+    descriptionLines: [[134], [97], [3]],
     color: '#FF00FF'
   },
   {
@@ -165,6 +166,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Using useRef instead of useState here is a key optimization because we don't want to trigger re-renders when selection changes as the selection state is only used for internal logic (highlighting and tooltip behavior)"
     ],
     lines: [4],
+    descriptionLines: [[4], [4]],
     color: '#FFD700'
   },
   {
@@ -175,6 +177,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Enables efficient updates to node properties without re-selecting elements"
     ],
     lines: [5, 19, 22, 23, 98],
+    descriptionLines: [[98], [5], [19, 22, 23]],
     color: '#00FFFF'
   },
   {
@@ -183,7 +186,8 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Event handlers are encapsulated in a single useMemo function as they share the same set of dependencies.",
       "Reduces the number of memoized values React needs to track with a single memory allocation for all handlers",
     ],
-    lines: [45],
+    lines: [45, 85, 86, 87, 88, 89, 90, 91, 92],
+    descriptionLines: [[45, 85, 86, 87, 88, 89, 90, 91, 92]],
     color: '#BF00FF'
   },
   {
@@ -194,6 +198,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Parent component (MainPage) is notified of selection change via `onNodeClick` callback, enabling or disabling the dropdown menus and timeslider.",
     ],
     lines: arrayRange(46, 65, 1),
+    descriptionLines: [[48], [50, 51], [53]],
     color: '#32CD32'
   },
   {
@@ -203,14 +208,17 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "It has special behavior when a node is selected: If there is a selected node (selectedNodeRef.current) and this is not that node (d.entity !== selectedNodeRef.current), then the hover is ignored.",
     ],
     lines: arrayRange(67, 76, 1),
+    descriptionLines: [[74, 75], [72]],
     color: '#FF7F50'
   },
   {
     title: "Mouseout event",
     descriptions: [
+      "Mouse out action is ignored for a selected (clicked) node.",
       "When the mouse cursor leaves the node, resets all nodes to their default opacity and hides the tooltip."
     ],
     lines: arrayRange(78, 84, 1),
+    descriptionLines: [[80], [82, 83]],
     color: '#0066FF'
   }
 ];

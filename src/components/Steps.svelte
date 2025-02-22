@@ -6,21 +6,48 @@
   const dispatch = createEventDispatcher();
 
   function handleMouseEnter(step, event) {
+    console.log('main step', step)
     const stepElement = event.currentTarget;
     const stepRect = stepElement.getBoundingClientRect();
     const containerRect = stepElement.parentElement.getBoundingClientRect();
 
     // Calculate relative position of the step from the top of its container
-    const relativePosition = stepRect.top - containerRect.top - 60;
+    const relativePosition = stepRect.top - containerRect.top - 30;
     
-    dispatch('highlight', { lines: step.lines, color: step.color });
-    dispatch('scroll', { 
-      line: step.lines[0],
-      stepPosition: relativePosition // Pass the step's position
+    // First scroll, then highlight after a short delay
+    dispatch('scroll', { line: step.lines[0], stepPosition: relativePosition // Pass the step's position
     });
+    
+    // Delay highlight to allow scroll to complete
+    setTimeout(() => {
+      dispatch('highlight', { lines: step.lines });
+    }, 100);
   }
 
   function handleMouseLeave() {
+    dispatch('highlight', { lines: []});
+  }
+
+  function handleDescriptionMouseEnter(step, descriptionIndex, event) {
+    // Stop propagation so it doesn't trigger the step's mouseenter event
+    event.stopPropagation();
+    console.log('description step', step)
+
+    // Check if step has descriptionLines property and it has an entry for this index
+    if (step.descriptionLines && step.descriptionLines[descriptionIndex]) {
+      // Dispatch highlight event with the specific description's lines
+      dispatch('highlight', { lines: step.descriptionLines[descriptionIndex] });
+    } else {
+      // Fallback to using the step's lines if no specific lines for this description
+      dispatch('highlight', { lines: step.lines });
+    }
+  }
+
+  function handleDescriptionMouseLeave(event) {
+    // Stop propagation so it doesn't trigger the step's mouseleave event
+    event.stopPropagation();
+    
+    // Reset highlight
     dispatch('highlight', { lines: []});
   }
 </script>
@@ -44,8 +71,12 @@
       <div class="step-content">
         {#if Array.isArray(step.descriptions)}
           <ul class="descriptions-list">
-            {#each step.descriptions as description}
-              <li class="description-item">{description}</li>
+            {#each step.descriptions as description, descriptionIndex}
+              <li 
+                class="description-item"
+                on:mouseenter={(e) => handleDescriptionMouseEnter(step, descriptionIndex, e)}
+                on:mouseleave={handleDescriptionMouseLeave}
+              >{description}</li>
             {/each}
           </ul>
         {:else}

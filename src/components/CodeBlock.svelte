@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
   import { getHighlighter } from 'shiki'
   
   export let height = '720px';
@@ -10,9 +10,9 @@
   export let highlightedLines = {};
 
   let defaultCode = "";
-  let highlightedCode;
   let codeContainer; // Bind to the outer container
   let isScrolling = false;
+  let preElement;
 
   function getColorForLine(lineNumber) {
     for (const step of steps) {
@@ -23,38 +23,27 @@
     return null;
   }
 
-  function defaultCodeStyle(code) {
-    return code.split('\n').map((line, index) => {
-      const highlightedLines = steps.find(step => step.lines.includes(index));
-      return highlightedLines ? 
-        `<span id="line-${index}" style="padding-left: 4px; border-left: 4px solid ${getColorForLine(index)}; background-color: #3a3659;">${line}</span>` :
-        `<span id="line-${index}" style="padding-left: 8px;">${line}</span>`;
-    }).join('\n');
-  }
-
-  function highlightCodeWithLines(code, lines) {
-    return code.split('\n').map((line, index) => {
-      return lines.lines.includes(index) ?
-        `<span id="line-${index}" style="padding-left: 4px; border-left: 4px solid ${getColorForLine(index)}; background-color: #3a3659;">${line}</span>` :
-        `<span id="line-${index}" style="padding-left: 8px;">${line}</span>`;
-    }).join('\n');
-  }
-
-  let highlightTimeout;
-
-  function updateHighlights() {
-    // Clear any existing timeout
-    if (highlightTimeout) {
-      clearTimeout(highlightTimeout);
+  // Apply highlighting directly to DOM elements instead of re-rendering
+  function applyHighlighting(lines) {
+    if (!preElement) return;
+    
+    // First, remove all current highlights
+    const allLines = preElement.querySelectorAll('[id^="line-"]');
+    allLines.forEach(line => {
+      line.style.backgroundColor = '';
+      line.style.paddingLeft = '8px';
+    });
+    
+    // Then apply new highlights if there are any lines to highlight
+    if (lines && lines.length > 0) {
+      lines.forEach(lineNumber => {
+        const lineElement = preElement.querySelector(`#line-${lineNumber}`);
+        if (lineElement) {
+          lineElement.style.backgroundColor = '#3a3659';
+          lineElement.style.paddingLeft = '4px';
+        }
+      });
     }
-
-    // Set new timeout for highlight update
-    highlightTimeout = setTimeout(() => {
-      isScrolling = false;
-      if (Object.keys(highlightedLines).length > 0) {
-        highlightedCode = highlightCodeWithLines(defaultCode, highlightedLines);
-      }
-    }, 350); // Adjust this delay as needed
   }
 
   export function scrollToLine(lineNumber, stepPosition) {
@@ -85,11 +74,14 @@
       top: scrollValue,
       behavior: 'smooth'
     });
-
-    // preElement.addEventListener('scrollend', () => {
-    //   updateHighlights();
-    // }, { once: true });
   }
+
+  // Watch for changes in highlightedLines
+  afterUpdate(() => {
+    if (!isScrolling && highlightedLines) {
+      applyHighlighting(highlightedLines.lines);
+    }
+  });
 
   onMount(async () => {
     const shikiHighlighter = await getHighlighter({
@@ -97,14 +89,43 @@
       langs: ['javascript', 'typescript', 'svelte', 'python']
     });
     
+    // Generate initial syntax highlighted code
     defaultCode = await shikiHighlighter.codeToHtml(code, { lang, theme: 'rose-pine-moon' });
     defaultCode = `<div>${blockName}</div>${defaultCode}`;
-    highlightedCode = defaultCodeStyle(defaultCode);
+    
+    // Apply line IDs to each line for targeting
+    const codeLines = defaultCode.split('\n');
+    const processedLines = codeLines.map((line, index) => {
+      return line.replace('<span class="line">', `<span id="line-${index}" class="line" style="padding-left: 8px; border-left: 4px solid ${getColorForLine(index)}; ">`);
+    });
+    
+    // Set the processed HTML
+    const processedCode = processedLines.join('\n');
+    
+    // Update the DOM with the processed code
+    if (codeContainer) {
+      codeContainer.innerHTML = processedCode;
+      preElement = codeContainer.querySelector('pre');
+      
+      // Add scroll event listener to detect when scrolling ends
+      preElement.addEventListener('scroll', () => {
+        if (!isScrolling) return;
+        
+        clearTimeout(preElement.scrollTimer);
+        preElement.scrollTimer = setTimeout(() => {
+          isScrolling = false;
+          // Re-apply highlighting after scrolling ends
+          if (highlightedLines && highlightedLines.lines) {
+            applyHighlighting(highlightedLines.lines);
+          }
+        }, 150);
+      });
+    }
   });
 </script>
 
 <div class="code-block" bind:this={codeContainer} style="--code-height: {height};">
-  {@html highlightedCode}
+
 </div>
 
 <style>

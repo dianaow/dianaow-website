@@ -33,7 +33,7 @@ const useProcessedData = (dataAll, filters, search) => {
   `;
 
   let codeBlockComponent;
-  let highlightedLines = [];
+  let highlightedLines = {};
 
   const steps = [
   {

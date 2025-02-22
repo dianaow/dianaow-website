@@ -110,7 +110,7 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
   `;
 
   let codeBlockComponent;
-  let highlightedLines = [];
+  let highlightedLines = {};
 
   const steps = [
   {
@@ -121,6 +121,7 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
       "Cleans up event listeners on component unmount, to prevent it from holding references to functions, data, and DOM elements even though the component that created them is gone, hindering them from being garbage collected."
     ],
     lines: arrayRange(10, 23, 1),
+    descriptionLines: [arrayRange(11, 16, 1), [18], [20, 21]],
     color: '#FF00FF'
   },
   {
@@ -131,16 +132,17 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
       "Caches results to prevent unnecessary recalculations. New node positions are only computed when certain data properties or window dimensions change."
     ],
     lines: arrayRange(31, 60, 1),
+    descriptionLines: [[51], [31], [35, 36, ,37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 53, 54, 55, 56, 57]], 
     color: '#FFD700'
   },
   {
     title: "Data Preparation for Visualization",
     descriptions: [
       "Combines computed node positions with original data attributes",
-      "Applies scaling functions to determine node sizes and colors",
       "Ensures data is in the correct and final format for the visualization layer",
     ],
     lines: arrayRange(63, 74, 1),
+    descriptionLines: [[71, 72], [69, 70, 71, 72, 73]],
     color: '#00FFFF'
   },
   {
@@ -150,6 +152,7 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
       "Handles data mapping for visual attributes like fill colors and opacity, establishing the interface between data and rendering in Nodes component",
     ],
     lines: arrayRange(77, 86, 1),
+    descriptionLines: [arrayRange(77, 86, 1), arrayRange(77, 86, 1)],
     color: '#BF00FF'
   }
 ];

@@ -14,15 +14,15 @@ published: true
   import CodeContainer3 from './CodeContainer3.svelte';
   import CodeContainer4 from './CodeContainer4.svelte';
   import VideoPlaceholder from '../../components/VideoPlaceholder.svelte';
-  import avos_video from "./videos/avos-tool.mov";
-  import avos_thumbnail from "./images/avos-tool.png"
+  import avos_video from "./videos/a-tool-demo.mov";
+  import avos_thumbnail from "./images/a-tool.png"
 </script>
 
 <VideoPlaceholder>
 
 <br/><br/>
 
-In this post, we'll explore the implementation of an [interactive React dashboard](https://avosp.vercel.app/) that visualizes data of hundreds of research papers. This dashboard demonstrates several React patterns and best practices that you can apply to your own projects.
+In this post, we'll explore the implementation of an interactive React dashboard that visualizes data of hundreds of research papers. This dashboard demonstrates several React patterns and best practices that you can apply to your own projects.
 
 ### The Big Picture
 The dashboard has the following key features:
@@ -254,11 +254,6 @@ One of the patterns used in this component is the separation of concerns using c
 - This makes the MainPage component cleaner and more focused on its layout and composition
 - Instead of seeing so many useState declarations at the top of MainPage, you get one clear hook call
 
-#### Testing
-- Having state logic in a separate hook makes it easier to unit test the state management independently
-- You can test state transitions and updates without dealing with component rendering
-- This separation often leads to better test coverage
-
 #### Maintenance and Documentation
 - The hook acts as a form of self-documentation - it clearly shows all the state that the page needs
 - When another developer needs to modify the state, they have one clear place to look
@@ -286,7 +281,6 @@ Why use useCallback here? There are several reasons:
 - Stable references help prevent unnecessary re-renders of child components
 
 #### Dependency Management
-- The callback depends on controlsDisabled
 - useCallback ensures the function only recreates when this dependency changes
 
 ```javascript
