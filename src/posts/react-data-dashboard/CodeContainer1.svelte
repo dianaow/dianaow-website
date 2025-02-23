@@ -3,7 +3,11 @@
   import Steps from '../../components/Steps.svelte';
   import { arrayRange } from '../../lib/utils.ts'
 
-  let code = `
+  let stepsComponent;
+  let codeBlockComponent;
+  let highlightedLines = {};
+  
+  const code = `
 const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
   const positionsRef = useRef(null);
   
@@ -109,9 +113,6 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
 });
   `;
 
-  let codeBlockComponent;
-  let highlightedLines = {};
-
   const steps = [
   {
     title: "Window Resize Handling",
@@ -163,7 +164,11 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
 
   function handleScroll(event) {
     if (codeBlockComponent) {
-      codeBlockComponent.scrollToLine(event.detail.line, event.detail.stepPosition);
+      codeBlockComponent.scrollToLine(
+        event.detail.line, 
+        event.detail.stepPosition,
+        event.detail.highlightId
+      );
     }
   }
 </script>
@@ -174,9 +179,11 @@ const RadarScatter = React.memo(({ data, search, journals, onNodeClick }) => {
     {code} 
     {highlightedLines} 
     {steps} 
+    {stepsComponent}
     blockName='src/RadarScatter' 
   />
   <Steps 
+    bind:this={stepsComponent}
     {steps} 
     on:highlight={handleHighlight} 
     on:scroll={handleScroll}

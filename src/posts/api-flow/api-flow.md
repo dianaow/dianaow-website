@@ -5,7 +5,7 @@ date: '2025-2-21'
 categories:
   - React
   - D3.js
-published: true
+published: false
 ---
 
 <script lang="ts">
@@ -16,7 +16,7 @@ published: true
 
 <br/><br/>
 
-In this post, we'll explore the backend implementation of this [interactive React dashboard](https://avosp.vercel.app/) that visualizes data of hundreds of research papers. I take a deep dive into the process of importing and parsing locally stored data files, in CSV, TSV and DOCX format, particularly focusing on asynchronous error handling.
+In this post, we'll explore the backend implementation of this [interactive React dashboard](https://dianaow.com/posts/react-data-dashboard) that visualizes data of hundreds of research papers. I take a deep dive into the process of importing and parsing locally stored data files, in CSV, TSV and DOCX format, particularly focusing on asynchronous error handling.
 
 
 ## Fetching data in TSV format

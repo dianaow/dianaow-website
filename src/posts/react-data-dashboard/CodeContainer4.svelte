@@ -3,7 +3,11 @@
   import Steps from '../../components/Steps.svelte';
   import { arrayRange } from '../../lib/utils.ts'
 
-  let code = `
+  let stepsComponent;
+  let codeBlockComponent;
+  let highlightedLines = {};
+  
+  const code = `
 const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
   const { setTooltip } = useContext(TooltipContext);
   const nodesRef = useRef(null);
@@ -143,10 +147,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
   );
 });
   `;
-
-  let codeBlockComponent;
-  let highlightedLines = {};
-
+  
   const steps = [
   {
     title: "nodesRef",
@@ -187,7 +188,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Reduces the number of memoized values React needs to track with a single memory allocation for all handlers",
     ],
     lines: [45, 85, 86, 87, 88, 89, 90, 91, 92],
-    descriptionLines: [[45, 85, 86, 87, 88, 89, 90, 91, 92]],
+    descriptionLines: [[45, 85, 86, 87, 88, 89, 90, 91, 92], [45, 85, 86, 87, 88, 89, 90, 91, 92]],
     color: '#BF00FF'
   },
   {
@@ -198,7 +199,7 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
       "Parent component (MainPage) is notified of selection change via `onNodeClick` callback, enabling or disabling the dropdown menus and timeslider.",
     ],
     lines: arrayRange(46, 65, 1),
-    descriptionLines: [[48], [50, 51], [53]],
+    descriptionLines: [[48], [50, 51], [54]],
     color: '#32CD32'
   },
   {
@@ -229,7 +230,11 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
 
   function handleScroll(event) {
     if (codeBlockComponent) {
-      codeBlockComponent.scrollToLine(event.detail.line, event.detail.stepPosition);
+      codeBlockComponent.scrollToLine(
+        event.detail.line, 
+        event.detail.stepPosition,
+        event.detail.highlightId
+      );
     }
   }
 </script>
@@ -240,10 +245,12 @@ const Nodes = React.memo(({ data, accessors, search, onNodeClick }) => {
     {code} 
     {highlightedLines} 
     {steps} 
+    {stepsComponent}
     blockName='src/Nodes'
     height="1400px"
   />
   <Steps 
+    bind:this={stepsComponent}
     {steps} 
     on:highlight={handleHighlight} 
     on:scroll={handleScroll}

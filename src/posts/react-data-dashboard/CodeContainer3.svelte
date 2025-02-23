@@ -3,7 +3,11 @@
   import Steps from '../../components/Steps.svelte';
   import { arrayRange } from '../../lib/utils.ts'
 
-  let code = `
+  let stepsComponent;
+  let codeBlockComponent;
+  let highlightedLines = {};
+
+  const code = `
 const useMainPageState = () => {
   const [dataAll, setData] = useState({ 
     data: [], 
@@ -33,9 +37,6 @@ const useMainPageState = () => {
   };
 };
   `;
-
-  let codeBlockComponent;
-  let highlightedLines = {};
 
   const steps = [
   {
@@ -98,7 +99,11 @@ const useMainPageState = () => {
 
   function handleScroll(event) {
     if (codeBlockComponent) {
-      codeBlockComponent.scrollToLine(event.detail.line, event.detail.stepPosition);
+      codeBlockComponent.scrollToLine(
+        event.detail.line, 
+        event.detail.stepPosition,
+        event.detail.highlightId
+      );
     }
   }
 </script>
@@ -109,10 +114,12 @@ const useMainPageState = () => {
     {code} 
     {highlightedLines} 
     {steps} 
+    {stepsComponent}
     blockName='src/MainPage'
     height="760px"
   />
   <Steps 
+    bind:this={stepsComponent}
     {steps} 
     on:highlight={handleHighlight} 
     on:scroll={handleScroll}

@@ -4,51 +4,170 @@
   export let image;
   export let steps = [];
   const dispatch = createEventDispatcher();
+  
+  let currentHighlightId = 0;
+  let highlightTimeouts = {};
+  let preElement; // Reference to the code container's pre element
+
+  // Function to check if a line is visible
+  function isLineFullyVisible(lineNumber) {
+    if (!preElement) return false;
+    
+    const lineElement = preElement.querySelector(`#line-${lineNumber}`);
+    if (!lineElement) return false;
+
+    const containerRect = preElement.getBoundingClientRect();
+    const lineRect = lineElement.getBoundingClientRect();
+    const buffer = 2; // Small buffer to account for partial pixel visibility
+
+    // Check if the line is fully visible within the container
+    return (
+      lineRect.top >= containerRect.top - buffer &&
+      lineRect.bottom <= containerRect.bottom + buffer &&
+      lineRect.height > 0 // Ensure the line has actual height
+    );
+  }
 
   function handleMouseEnter(step, event) {
-    console.log('main step', step)
+    const highlightId = ++currentHighlightId;
+    
     const stepElement = event.currentTarget;
     const stepRect = stepElement.getBoundingClientRect();
     const containerRect = stepElement.parentElement.getBoundingClientRect();
-
-    // Calculate relative position of the step from the top of its container
     const relativePosition = stepRect.top - containerRect.top - 30;
     
-    // First scroll, then highlight after a short delay
-    dispatch('scroll', { line: step.lines[0], stepPosition: relativePosition // Pass the step's position
+    // Always scroll for step-item
+    dispatch('scroll', { 
+      line: step.lines[0], 
+      stepPosition: relativePosition,
+      highlightId: highlightId
     });
     
-    // Delay highlight to allow scroll to complete
-    setTimeout(() => {
-      dispatch('highlight', { lines: step.lines });
+    // Change text color to match bullet
+    const titleElement = stepElement.querySelector('.step-title');
+    if (titleElement) {
+      titleElement.style.color = step.color;
+    }
+    
+    Object.keys(highlightTimeouts).forEach(id => {
+      clearTimeout(highlightTimeouts[id]);
+      delete highlightTimeouts[id];
+    });
+    
+    highlightTimeouts[highlightId] = setTimeout(() => {
+      if (highlightId === currentHighlightId) {
+        dispatch('highlight', { 
+          lines: step.lines,
+          highlightId: highlightId
+        });
+      }
+      delete highlightTimeouts[highlightId];
     }, 100);
   }
 
-  function handleMouseLeave() {
-    dispatch('highlight', { lines: []});
+  function handleMouseLeave(event) {
+    const highlightId = ++currentHighlightId;
+    
+    // Reset text color
+    const stepElement = event.currentTarget;
+    const titleElement = stepElement.querySelector('.step-title');
+    if (titleElement) {
+      titleElement.style.color = 'rgb(203, 213, 225)';
+    }
+    
+    Object.keys(highlightTimeouts).forEach(id => {
+      clearTimeout(highlightTimeouts[id]);
+      delete highlightTimeouts[id];
+    });
+    
+    highlightTimeouts[highlightId] = setTimeout(() => {
+      if (highlightId === currentHighlightId) {
+        dispatch('highlight', { 
+          lines: [],
+          highlightId: highlightId
+        });
+      }
+      delete highlightTimeouts[highlightId];
+    }, 50);
   }
 
   function handleDescriptionMouseEnter(step, descriptionIndex, event) {
-    // Stop propagation so it doesn't trigger the step's mouseenter event
     event.stopPropagation();
-    console.log('description step', step)
-
-    // Check if step has descriptionLines property and it has an entry for this index
+    
+    const highlightId = ++currentHighlightId;
+    const descriptionElement = event.currentTarget;
+    
+    // Change text color to white
+    descriptionElement.style.color = 'white';
+    
+    Object.keys(highlightTimeouts).forEach(id => {
+      clearTimeout(highlightTimeouts[id]);
+      delete highlightTimeouts[id];
+    });
+    
+    let linesToHighlight = step.lines;
     if (step.descriptionLines && step.descriptionLines[descriptionIndex]) {
-      // Dispatch highlight event with the specific description's lines
-      dispatch('highlight', { lines: step.descriptionLines[descriptionIndex] });
-    } else {
-      // Fallback to using the step's lines if no specific lines for this description
-      dispatch('highlight', { lines: step.lines });
+      linesToHighlight = step.descriptionLines[descriptionIndex];
     }
+    
+    // Check if any of the lines are not visible
+    // Check if any of the target lines are not fully visible
+    const shouldScroll = linesToHighlight.some(lineNumber => !isLineFullyVisible(lineNumber));
+    
+    if (shouldScroll) {
+      // Only scroll if lines are not visible
+      const stepElement = descriptionElement.closest('.step-item');
+      const stepRect = stepElement.getBoundingClientRect();
+      const containerRect = stepElement.parentElement.getBoundingClientRect();
+      const relativePosition = stepRect.top - containerRect.top - 30;
+      
+      dispatch('scroll', { 
+        line: linesToHighlight[0], 
+        stepPosition: relativePosition,
+        highlightId: highlightId
+      });
+    }
+    
+    highlightTimeouts[highlightId] = setTimeout(() => {
+      if (highlightId === currentHighlightId) {
+        dispatch('highlight', { 
+          lines: linesToHighlight,
+          highlightId: highlightId
+        });
+      }
+      delete highlightTimeouts[highlightId];
+    }, 100);
   }
 
   function handleDescriptionMouseLeave(event) {
-    // Stop propagation so it doesn't trigger the step's mouseleave event
     event.stopPropagation();
     
-    // Reset highlight
-    dispatch('highlight', { lines: []});
+    const highlightId = ++currentHighlightId;
+    const descriptionElement = event.currentTarget;
+    
+    // Reset text color
+    descriptionElement.style.color = 'rgb(148, 163, 184)';
+    
+    Object.keys(highlightTimeouts).forEach(id => {
+      clearTimeout(highlightTimeouts[id]);
+      delete highlightTimeouts[id];
+    });
+    
+    highlightTimeouts[highlightId] = setTimeout(() => {
+      if (highlightId === currentHighlightId) {
+        dispatch('highlight', { 
+          lines: [],
+          highlightId: highlightId
+        });
+      }
+      delete highlightTimeouts[highlightId];
+    }, 50);
+  }
+
+  // Get reference to pre element from CodeBlock
+  export function setPreElement(element) {
+    console.log('[Steps] Received pre element:', element);
+    preElement = element;
   }
 </script>
 
@@ -57,7 +176,7 @@
     <li 
       class="step-item"
       on:mouseenter={(e) => handleMouseEnter(step, e)} 
-      on:mouseleave={() => handleMouseLeave()}
+      on:mouseleave={handleMouseLeave}
     >
       <div class="step-header">
         <span 

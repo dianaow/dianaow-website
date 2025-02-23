@@ -3,7 +3,11 @@
   import Steps from '../../components/Steps.svelte';
   import { arrayRange } from '../../lib/utils.ts'
 
-  let code = `
+  let stepsComponent;
+  let codeBlockComponent;
+  let highlightedLines = {};
+
+  const code = `
 const useProcessedData = (dataAll, filters, search) => {
   return useMemo(() => {
     if (!dataAll.data?.length) return [];
@@ -32,9 +36,6 @@ const useProcessedData = (dataAll, filters, search) => {
 };
   `;
 
-  let codeBlockComponent;
-  let highlightedLines = {};
-
   const steps = [
   {
     title: "Combines multiple filter conditions",
@@ -62,7 +63,11 @@ const useProcessedData = (dataAll, filters, search) => {
 
   function handleScroll(event) {
     if (codeBlockComponent) {
-      codeBlockComponent.scrollToLine(event.detail.line, event.detail.stepPosition);
+      codeBlockComponent.scrollToLine(
+        event.detail.line, 
+        event.detail.stepPosition,
+        event.detail.highlightId
+      );
     }
   }
 </script>
@@ -73,9 +78,11 @@ const useProcessedData = (dataAll, filters, search) => {
     {code} 
     {highlightedLines} 
     {steps} 
+    {stepsComponent}
     blockName='src/MainPage'
   />
   <Steps 
+    bind:this={stepsComponent}
     {steps} 
     on:highlight={handleHighlight} 
     on:scroll={handleScroll}
