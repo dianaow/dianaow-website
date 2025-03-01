@@ -163,7 +163,11 @@ const importScores = async (directory) => {
 
   function handleScroll(event) {
     if (codeBlockComponent) {
-      codeBlockComponent.scrollToLine(event.detail.line, event.detail.stepPosition);
+      codeBlockComponent.scrollToLine(
+        event.detail.line, 
+        event.detail.stepPosition,
+        event.detail.highlightId
+      );
     }
   }
 </script>
@@ -174,7 +178,7 @@ const importScores = async (directory) => {
     {code} 
     {highlightedLines} 
     {steps} 
-    blockName='src/RadarScatter' 
+    {stepsComponent}
     height="1400px"
   />
   <Steps 
