@@ -10,6 +10,7 @@ categories:
   - Neo4j
   - D3.js
 type: 'roundup'
+thumbnail: 'https://dianaow.com/_app/immutable/assets/graph_snapshot.pufcFAjN.png'
 ---
 
 <script lang="ts">
