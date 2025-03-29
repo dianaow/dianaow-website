@@ -20,16 +20,22 @@
               const videoSrc = videoPlaceholder.getAttribute("data-src");
 
               const imgElement = videoPlaceholder.querySelector("img");
+              const placeholderSrc = imgElement?.getAttribute("src");
               videoPlaceholder.removeChild(imgElement)
               //imgElement.style.display = "none";
 
               const video = document.createElement("video");
               video.src = videoSrc;
-              video.autoplay = true;
+              video.poster = placeholderSrc;
+              video.autoplay = false;
               video.loop = true;
               video.playsInline = true;
               video.muted = true;
               video.preload = "none";
+              video.controls = true;
+              video.style.width = "100%";
+              video.style.height = "auto";
+              video.style.maxWidth = "100%";
 
               videoPlaceholder.appendChild(video);
               observer.unobserve(videoPlaceholder);

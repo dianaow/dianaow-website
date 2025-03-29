@@ -3,9 +3,10 @@
 	import * as config from '$lib/config'
 
 	export let data
-
+	$: console.log('data', data.posts)
 	$: roundups = data.posts.filter(d => d.type === 'roundup')
 	$: posts = data.posts.filter(d => d.type !== 'roundup')
+	$: cases = data.posts.filter(d => d.type === 'casestudy')
 </script>
 
 <svelte:head>
@@ -18,6 +19,20 @@
 		<div class="pb-4">
 			<a href={'/posts/' + post.slug} class="title"><h2 >{post.title}</h2></a>
 			<h4 style='margin: 0px'>{post.description}</h4>			
+		</div>
+	{/each}
+	<br><br>
+	<h1 style='color: white'>Case Studies</h1>
+	{#each cases as post}
+		<div class="pb-4">
+			<a href={'/posts/' + post.slug} class="title"><h2>{post.title}</h2></a>
+			<p class="date">{formatDate(post.date)}</p>
+			<h4>{post.description}</h4>
+			<div class="tags">
+				{#each post.categories as category}
+					<button>{category}</button>
+				{/each}
+			</div>			
 		</div>
 	{/each}
 	<br><br>
